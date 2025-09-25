@@ -16,6 +16,15 @@ Edited-By: nakayama 2025-09-25
 - Firebase Web設定:
 - `.env` 経由で各種 Firebase 設定を注入する（`VITE_FIREBASE_*` 系）。リポジトリには `.env.example` を用意しておく
 - Web Push VAPID 公開鍵は Secrets で管理し、`.env` から読み込む
+- GitHub Pages 配信時は Actions Secrets に以下を登録してビルドする
+  - `VITE_FIREBASE_API_KEY`
+  - `VITE_FIREBASE_AUTH_DOMAIN`
+  - `VITE_FIREBASE_PROJECT_ID`
+  - `VITE_FIREBASE_STORAGE_BUCKET`
+  - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+  - `VITE_FIREBASE_APP_ID`
+  - `VITE_FIREBASE_VAPID_KEY`
+  - `VITE_FUNCTIONS_BASE_URL`
 - iOS Safari Web Push を有効化するには Apple Developer Program（年額99USD）への加入と APNs Auth Key 登録が必要
 
 ---
