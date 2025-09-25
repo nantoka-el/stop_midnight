@@ -518,7 +518,7 @@ let currentTab: 'today' | 'calendar' | 'setting' = 'today'
 let cachedPushToken: string | null = null
 
 const FUNCTIONS_BASE_URL = import.meta.env.VITE_FUNCTIONS_BASE_URL ?? 'https://asia-northeast1-stop-midnight.cloudfunctions.net'
-const VAPID_KEY = 'BL2zzNfK5mbFt_75bWyZ_V1HoI7AOwsHbbLAQDvYHlnY-W4ETfUdRMW2WG-Zr9JKawpABqE6RKAfk_fLo52bBMQ'
+const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY
 
 headerTitle.textContent = 'Stop Midnight'
 document.documentElement.dataset.todayState = 'plan'
@@ -1047,9 +1047,8 @@ async function ensureServiceWorker(): Promise<ServiceWorkerRegistration> {
   if (!('serviceWorker' in navigator)) {
     throw new Error('ServiceWorkerがサポートされていません')
   }
-  const swUrl = `${import.meta.env.BASE_URL ?? '/'}firebase-messaging-sw.js`
-  const scope = import.meta.env.BASE_URL ?? '/'
-  const registration = await navigator.serviceWorker.register(swUrl, { scope })
+  const swUrl = new URL('./firebase-messaging-sw.ts', import.meta.url)
+  const registration = await navigator.serviceWorker.register(swUrl, { type: 'module' })
   return registration
 }
 
@@ -1072,6 +1071,9 @@ async function retrieveMessagingToken(): Promise<string> {
     throw new Error('このブラウザではプッシュ通知を利用できません')
   }
   const registration = await ensureServiceWorker()
+  if (!VAPID_KEY) {
+    throw new Error('VAPIDキーが設定されていません')
+  }
   const token = await getToken(messaging, {
     vapidKey: VAPID_KEY,
     serviceWorkerRegistration: registration,

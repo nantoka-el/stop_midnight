@@ -14,17 +14,8 @@ Edited-By: nakayama 2025-09-25
 - まずはデスクトップ/Androidブラウザでの確認を優先し、iOS対応は証明書準備後に検証予定
 - セキュリティのため.envやSecret Managerへの移行方針も合わせて検討する
 - Firebase Web設定:
-  ```js
-  const firebaseConfig = {
-    apiKey: "AIzaSyBahhVWxtoWTV6Zwo7Bh5ucmivJdBIKp0g",
-    authDomain: "stop-midnight.firebaseapp.com",
-    projectId: "stop-midnight",
-    storageBucket: "stop-midnight.firebasestorage.app",
-    messagingSenderId: "372275431449",
-    appId: "1:372275431449:web:aa9314f106b32a4df74288"
-  }
-  ```
-- Web Push VAPID 公開鍵: `BL2zzNfK5mbFt_75bWyZ_V1HoI7AOwsHbbLAQDvYHlnY-W4ETfUdRMW2WG-Zr9JKawpABqE6RKAfk_fLo52bBMQ`
+- `.env` 経由で各種 Firebase 設定を注入する（`VITE_FIREBASE_*` 系）。リポジトリには `.env.example` を用意しておく
+- Web Push VAPID 公開鍵は Secrets で管理し、`.env` から読み込む
 - iOS Safari Web Push を有効化するには Apple Developer Program（年額99USD）への加入と APNs Auth Key 登録が必要
 
 ---

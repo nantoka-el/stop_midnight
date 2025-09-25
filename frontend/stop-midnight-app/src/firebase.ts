@@ -3,12 +3,17 @@ import { getMessaging, isSupported } from 'firebase/messaging'
 import type { Messaging } from 'firebase/messaging'
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBahhVWxtoWTV6Zwo7Bh5ucmivJdBIKp0g',
-  authDomain: 'stop-midnight.firebaseapp.com',
-  projectId: 'stop-midnight',
-  storageBucket: 'stop-midnight.firebasestorage.app',
-  messagingSenderId: '372275431449',
-  appId: '1:372275431449:web:aa9314f106b32a4df74288',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+}
+
+const missingKey = Object.entries(firebaseConfig).find(([, value]) => !value)
+if (missingKey) {
+  console.warn(`Firebase config is missing value for ${missingKey[0]}`)
 }
 
 const app = initializeApp(firebaseConfig)

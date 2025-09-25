@@ -3,6 +3,8 @@ node_modules/
 functions/node_modules/
 functions/lib/
 frontend/stop-midnight-app/dist/
+.env*
+!.env.example
 
 # Firebase / debug
 firebase-debug.log
