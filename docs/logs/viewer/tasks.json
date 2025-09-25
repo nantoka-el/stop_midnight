@@ -266,7 +266,7 @@
       "26"
     ],
     "title": "FCMプッシュ通知の一気通貫実装",
-    "status": "todo",
-    "filename": "0026_fcm_end_to_end_todo.md"
+    "status": "review",
+    "filename": "0026_fcm_end_to_end_review.md"
   }
 ]

@@ -1,10 +1,10 @@
 # Logs INDEX
-*自動生成: 2025/9/25 21:02:32*
+*自動生成: 2025/9/26 3:08:21*
 
 ## 📊 サマリー
 - BACKLOG: 1件
-- TODO: 7件
-- REVIEW: 4件
+- TODO: 6件
+- REVIEW: 5件
 - DONE: 15件
 - 合計: 27件
 
@@ -12,7 +12,7 @@
 
 - **0004: プライバシー保護機能の検討** - [0004_privacy_guard_backlog.md](./tasks/0004_privacy_guard_backlog.md)
 
-## 📝 TODO (7)
+## 📝 TODO (6)
 
 - **0002: 目標設定フローの仕様整理** - [0002_goal_setting_spec_todo.md](./tasks/0002_goal_setting_spec_todo.md)
 - **0005: FCM通知基盤の設計** - [0005_fcm_notification_plan_todo.md](./tasks/0005_fcm_notification_plan_todo.md)
@@ -20,14 +20,14 @@
 - **0018: ゲーミフィケーション要素の設計・UI反映** - [0018_gamification_concept_todo.md](./tasks/0018_gamification_concept_todo.md)
 - **0024: リポジトリ全体DeepDive再読** - [0024_repository_deepdive_todo.md](./tasks/0024_repository_deepdive_todo.md)
 - **0025: TODAY/Calendar UI刷新案策定** - [0025_ui_refresh_spec_todo.md](./tasks/0025_ui_refresh_spec_todo.md)
-- **0026: FCMプッシュ通知の一気通貫実装** - [0026_fcm_end_to_end_todo.md](./tasks/0026_fcm_end_to_end_todo.md)
 
-## 🔍 REVIEW (4)
+## 🔍 REVIEW (5)
 
 - **0006: Firebase CLI セットアップと初期設定** - [0006_firebase_cli_setup_review.md](./tasks/0006_firebase_cli_setup_review.md)
 - **0014: Vite + TypeScriptによるフロントエンド実装** - [0014_frontend_impl_review.md](./tasks/0014_frontend_impl_review.md)
 - **0021: ゲーミフィケーション要素の再設計** - [0021_gamification_deepdive_review.md](./tasks/0021_gamification_deepdive_review.md)
 - **0022: タブバーのアクティブ表示改善** - [0022_tabbar_ui_fix_review.md](./tasks/0022_tabbar_ui_fix_review.md)
+- **0026: FCMプッシュ通知の一気通貫実装** - [0026_fcm_end_to_end_review.md](./tasks/0026_fcm_end_to_end_review.md)
 
 ## ✅ DONE (15)
 
