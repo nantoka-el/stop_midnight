@@ -1,120 +1,12 @@
 import './style.css'
 import { getToken, onMessage } from 'firebase/messaging'
 import { getMessagingIfSupported } from './firebase'
+import { deleteNightLog, fetchNightLogs, isPositiveReview, saveNightPlan, saveNightReview } from './firestore'
+import type { AppState, NightRecord, ReviewRating } from './types'
 
-type RatingSymbol = '◎' | '○' | '△' | '✕'
-type ReviewRating = 'great' | 'good' | 'ok' | 'bad'
+import type { RatingSymbol } from './types'
 
-type PlannerTimeslot = {
-  start: string
-  end: string
-  randomize: boolean
-}
-
-type MotivationReminder = {
-  time: string
-  enabled: boolean
-}
-
-type TodayPlan = {
-  text: string
-  chips: string[]
-  customChips: string[]
-  recommended: string
-}
-
-type ReviewState = {
-  pending: boolean
-  rating: ReviewRating | null
-  notes: string
-  avoided: string[]
-  mood: number
-  reviewTimestamp?: Date
-}
-
-type NightPlan = {
-  text: string
-  updatedAt: string
-}
-
-type NightReview = {
-  text: string
-  rating: RatingSymbol
-  mood: number
-  avoided: string[]
-  updatedAt: string
-}
-
-type NightRecord = {
-  streak: number
-  plan?: NightPlan
-  review?: NightReview
-}
-
-type Achievement = {
-  id: string
-  title: string
-  description: string
-  icon: string
-  unlocked: boolean
-  progress: number
-  goal: number
-  category: 'streak' | 'habit' | 'recovery'
-}
-
-type AppState = {
-  displayName: string
-  avoidanceGoals: string[]
-  plannerLabel: string
-  plannerPromptTimeslot: PlannerTimeslot
-  reviewPromptTime: string
-  motivationReminder: MotivationReminder
-  passcodeEnabled: boolean
-  streak: number
-  todayDate: Date
-  todayPlan: TodayPlan
-  review: ReviewState
-  achievements: Achievement[]
-  records: Record<string, NightRecord>
-}
-
-const initialRecords: Record<string, NightRecord> = {
-  '2025/09/20': {
-    streak: 4,
-    plan: { text: '映画を観る', updatedAt: '2025/09/20 21:00' },
-    review: { text: '映画鑑賞でリフレッシュ。夜食も回避。', rating: '◎', mood: 5, avoided: ['夜食'], updatedAt: '2025/09/21 04:05' },
-  },
-  '2025/09/21': {
-    streak: 5,
-    plan: { text: 'ストレッチ', updatedAt: '2025/09/21 20:30' },
-    review: { text: 'ストレッチのみ。深夜の誘惑なし。', rating: '○', mood: 4, avoided: ['夜食'], updatedAt: '2025/09/22 04:03' },
-  },
-  '2025/09/22': {
-    streak: 0,
-    plan: { text: '本を読む', updatedAt: '2025/09/22 21:10' },
-    review: { text: '途中でSNS見ちゃった。次は時間を決める。', rating: '△', mood: 3, avoided: ['闇カジノ'], updatedAt: '2025/09/23 09:15' },
-  },
-  '2025/09/23': {
-    streak: 1,
-    plan: { text: '早めに寝る', updatedAt: '2025/09/23 21:15' },
-    review: { text: 'ちゃんと寝れた。偉い。', rating: '◎', mood: 5, avoided: ['夜食'], updatedAt: '2025/09/24 04:02' },
-  },
-  '2025/09/24': {
-    streak: 2,
-    plan: { text: '読書30分', updatedAt: '2025/09/24 20:45' },
-    review: { text: 'ほぼ読書。お腹空いたけど耐えた。', rating: '○', mood: 4, avoided: ['夜食'], updatedAt: '2025/09/25 04:01' },
-  },
-  '2025/09/25': {
-    streak: 0,
-    plan: { text: 'アニメ2話のみ', updatedAt: '2025/09/25 21:30' },
-    review: { text: '長引かせてしまった。振り返り大事。', rating: '✕', mood: 2, avoided: [], updatedAt: '2025/09/26 10:12' },
-  },
-  '2025/09/26': {
-    streak: 1,
-    plan: { text: '英語学習', updatedAt: '2025/09/26 20:20' },
-    review: { text: '集中できた！', rating: '◎', mood: 5, avoided: ['闇カジノ'], updatedAt: '2025/09/27 04:08' },
-  },
-}
+const initialRecords: Record<string, NightRecord> = {}
 
 const state: AppState = {
   displayName: 'りんね',
@@ -124,7 +16,7 @@ const state: AppState = {
   reviewPromptTime: '04:00',
   motivationReminder: { time: '21:00', enabled: true },
   passcodeEnabled: false,
-  streak: 3,
+  streak: 0,
   todayDate: new Date(),
   todayPlan: {
     text: '',
@@ -205,6 +97,40 @@ function getRecord(dateKey: string, create = false): NightRecord | undefined {
     state.records[dateKey] = record
   }
   return record
+}
+
+function parseDateKeyToDate(key: string): Date {
+  return new Date(key.replace(/\//g, '-'))
+}
+
+function computeCurrentStreak(records: Record<string, NightRecord>): number {
+  const keys = Object.keys(records).sort()
+  if (keys.length === 0) return 0
+
+  let streak = 0
+  let previousDate: Date | null = null
+
+  for (let i = keys.length - 1; i >= 0; i--) {
+    const key = keys[i]
+    const record = records[key]
+    if (!isPositiveReview(record)) {
+      break
+    }
+
+    const currentDate = parseDateKeyToDate(key)
+    if (previousDate) {
+      const diffMs = previousDate.getTime() - currentDate.getTime()
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24))
+      if (diffDays !== 1) {
+        break
+      }
+    }
+
+    streak += 1
+    previousDate = currentDate
+  }
+
+  return streak
 }
 
 function loadSelectedDate(date: Date) {
@@ -850,10 +776,18 @@ function selectDateForEditing(dateKey: string, target: 'plan' | 'review') {
   updateTodayUI()
 }
 
-function deleteRecord(dateKey: string) {
+async function deleteNightRecord(dateKey: string) {
   const record = getRecord(dateKey)
   if (!record) return
+  try {
+    await deleteNightLog(dateKey)
+  } catch (error) {
+    console.error('記録の削除に失敗しました', error)
+    window.alert('記録の削除に失敗しました')
+    return
+  }
   delete state.records[dateKey]
+  state.streak = computeCurrentStreak(state.records)
   if (formatDateKey(state.todayDate) === dateKey) {
     loadSelectedDate(state.todayDate)
     renderPlanner()
@@ -881,7 +815,7 @@ function bindTodayActions() {
     renderPlanner()
   })
 
-  qs<HTMLButtonElement>('#planner-save').addEventListener('click', () => {
+  qs<HTMLButtonElement>('#planner-save').addEventListener('click', async () => {
     const text = plannerText.value.trim()
     if (!text) {
       window.alert('計画を入力してください')
@@ -891,10 +825,17 @@ function bindTodayActions() {
     state.todayPlan.text = text
     const key = formatDateKey(state.todayDate)
     const record = getRecord(key, true)!
-    record.plan = { text, updatedAt: formatTimestamp(new Date()) }
+    const now = new Date()
+    record.plan = { text, updatedAt: formatTimestamp(now) }
     record.streak = record.streak || 0
     state.review.pending = !record.review
-    window.alert('計画を保存しました（モック）')
+    try {
+      await saveNightPlan(key, record.plan, state.avoidanceGoals)
+      window.alert('計画を保存しました')
+    } catch (error) {
+      console.error('計画の保存に失敗しました', error)
+      window.alert('計画の保存に失敗しました')
+    }
     updateTodayUI()
     renderCalendar()
   })
@@ -921,7 +862,7 @@ function bindTodayActions() {
     window.setTimeout(() => plannerText.focus(), 50)
   })
 
-  qs<HTMLButtonElement>('#review-save').addEventListener('click', () => {
+  qs<HTMLButtonElement>('#review-save').addEventListener('click', async () => {
     if (!state.review.rating) {
       window.alert('評価を選択してください')
       return
@@ -941,9 +882,16 @@ function bindTodayActions() {
       avoided: [...state.review.avoided],
       updatedAt: formatTimestamp(now),
     }
-    record.streak = ratingSymbol === '◎' || ratingSymbol === '○' ? state.streak : 0
+    state.streak = computeCurrentStreak(state.records)
+    record.streak = state.streak
 
-    window.alert('レビューを保存しました（モック）')
+    try {
+      await saveNightReview(key, record.review, state.streak)
+      window.alert('レビューを保存しました')
+    } catch (error) {
+      console.error('レビューの保存に失敗しました', error)
+      window.alert('レビューの保存に失敗しました')
+    }
     reviewCard.classList.add('hidden')
     plannerCard.classList.remove('hidden')
     currentTodayView = 'plan'
@@ -1173,6 +1121,21 @@ async function setupPushMessaging() {
   }
 }
 
+async function hydrateNightLogs() {
+  try {
+    const records = await fetchNightLogs()
+    state.records = records
+    state.streak = computeCurrentStreak(state.records)
+    loadSelectedDate(state.todayDate)
+    renderPlanner()
+    renderReview()
+    renderCalendar()
+    updateTodayUI()
+  } catch (error) {
+    console.error('Firestoreからのログ取得に失敗しました', error)
+  }
+}
+
 function bindModal() {
   qs<HTMLButtonElement>('#modal-close').addEventListener('click', closeModal)
   modal.addEventListener('click', (event) => {
@@ -1193,13 +1156,9 @@ function bindModal() {
   modalDelete.addEventListener('click', () => {
     if (!activeModalDateKey) return
     if (window.confirm('この日の記録を削除しますか？')) {
-      deleteRecord(activeModalDateKey)
+      const targetKey = activeModalDateKey
       closeModal()
-      if (formatDateKey(state.todayDate) === activeModalDateKey) {
-        renderPlanner()
-        renderReview()
-        updateTodayUI()
-      }
+      void deleteNightRecord(targetKey)
     }
   })
 }
@@ -1221,6 +1180,7 @@ function init() {
     void sendTestNotification()
   })
   void setupPushMessaging()
+  void hydrateNightLogs()
 }
 
 init()

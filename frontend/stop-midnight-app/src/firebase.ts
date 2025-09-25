@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getMessaging, isSupported } from 'firebase/messaging'
+import { getAuth, signInAnonymously } from 'firebase/auth'
 import type { Messaging } from 'firebase/messaging'
 
 const firebaseConfig = {
@@ -19,6 +20,8 @@ if (missingKey) {
 const app = initializeApp(firebaseConfig)
 
 let messagingInstance: Messaging | null = null
+const auth = getAuth(app)
+let authPromise: Promise<string> | null = null
 
 async function getMessagingIfSupported(): Promise<Messaging | null> {
   if (messagingInstance) {
@@ -31,4 +34,19 @@ async function getMessagingIfSupported(): Promise<Messaging | null> {
   return messagingInstance
 }
 
-export { app, getMessagingIfSupported }
+async function ensureAuth(): Promise<string> {
+  if (auth.currentUser?.uid) {
+    return auth.currentUser.uid
+  }
+  if (!authPromise) {
+    authPromise = signInAnonymously(auth)
+      .then((cred) => cred.user.uid)
+      .catch((error) => {
+        authPromise = null
+        throw error
+      })
+  }
+  return authPromise
+}
+
+export { app, getMessagingIfSupported, ensureAuth }
