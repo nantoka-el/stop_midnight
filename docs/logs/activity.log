@@ -88,3 +88,8 @@
 {"ts":"2025-09-25T12:02:23.079Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0026_fcm_end_to_end_todo.md"}
 {"ts":"2025-09-25T18:06:30.771Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0026_fcm_end_to_end_review.md"}
 {"ts":"2025-09-25T18:08:10.993Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0026_fcm_end_to_end_review.md"}
+{"ts":"2025-09-25T18:14:20.667Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0027_firestore_integration_todo.md"}
+{"ts":"2025-09-25T18:14:34.458Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0028_pwa_assets_setup_todo.md"}
+{"ts":"2025-09-25T18:15:01.235Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0029_push_validation_plan_todo.md"}
+{"ts":"2025-09-25T18:15:21.109Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0030_ui_polish_secondpass_todo.md"}
+{"ts":"2025-09-25T18:34:07.087Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0031_multi_user_design_todo.md"}

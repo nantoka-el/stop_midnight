@@ -268,5 +268,55 @@
     "title": "FCMプッシュ通知の一気通貫実装",
     "status": "review",
     "filename": "0026_fcm_end_to_end_review.md"
+  },
+  {
+    "id": "0027",
+    "idRaw": "27",
+    "aliases": [
+      "27"
+    ],
+    "title": "Firestore連携による夜ログ保存",
+    "status": "todo",
+    "filename": "0027_firestore_integration_todo.md"
+  },
+  {
+    "id": "0028",
+    "idRaw": "28",
+    "aliases": [
+      "28"
+    ],
+    "title": "PWAアイコンとmanifest整備",
+    "status": "todo",
+    "filename": "0028_pwa_assets_setup_todo.md"
+  },
+  {
+    "id": "0029",
+    "idRaw": "29",
+    "aliases": [
+      "29"
+    ],
+    "title": "プッシュ通知検証とApple Developer準備",
+    "status": "todo",
+    "filename": "0029_push_validation_plan_todo.md"
+  },
+  {
+    "id": "0030",
+    "idRaw": "30",
+    "aliases": [
+      "30"
+    ],
+    "title": "UI再調整と演出ブラッシュアップ",
+    "status": "todo",
+    "filename": "0030_ui_polish_secondpass_todo.md"
+  },
+  {
+    "id": "0031",
+    "idRaw": "31",
+    "aliases": [
+      "31"
+    ],
+    "title": "マルチユーザー対応の設計検討",
+    "status": "todo",
+    "filename": "0031_multi_user_design_todo.md"
   }
 ]
