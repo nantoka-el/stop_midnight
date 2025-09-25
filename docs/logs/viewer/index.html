@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Stop Midnight Task Viewer</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Crect width='256' height='256' rx='48' fill='%231f6feb'/%3E%3Ctext x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-family='Segoe UI,Roboto,Arial' font-size='120' fill='white'%3E✓%3C/text%3E%3C/svg%3E"/>
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('theme');
+          var preferDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored || (preferDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>📋 <span id="app-title">Stop Midnight Task Viewer</span></h1>
+        <div class="search-container">
+            <input type="text" id="search-box" class="search-box" placeholder="タスクを検索...">
+            <button id="search-mode-toggle" class="search-mode-toggle">🔎 タイトル検索</button>
+            <button id="manual-refresh-btn" class="search-mode-toggle" title="一覧を再読込">🔄 再読込</button>
+            <button id="settings-toggle" class="search-mode-toggle" title="設定">⚙️ 設定</button>
+            <button id="history-toggle" class="search-mode-toggle" title="変更履歴">🕒 履歴</button>
+            <button id="new-task-toggle" class="search-mode-toggle" title="新規タスク">＋ 新規</button>
+        </div>
+        <div class="header-stats">
+            <div id="total-count" class="total-count"></div>
+            <div class="update-time">更新: <span id="last-update">--:--</span></div>
+        </div>
+    </header>
+    
+    <div id="search-results" class="search-results"></div>
+    
+    <main>
+        <div class="status-column" id="backlog-section">
+            <div class="status-header">
+                <span class="status-badge">BACKLOG</span>
+                <span class="status-count" id="backlog-count">0</span>
+            </div>
+            <div class="task-list" id="backlog-list"></div>
+        </div>
+        
+        <div class="status-column" id="todo-section">
+            <div class="status-header">
+                <span class="status-badge">TODO</span>
+                <span class="status-count" id="todo-count">0</span>
+            </div>
+            <div class="task-list" id="todo-list"></div>
+        </div>
+        
+        <div class="status-column" id="review-section">
+            <div class="status-header">
+                <span class="status-badge">REVIEW</span>
+                <span class="status-count" id="review-count">0</span>
+            </div>
+            <div class="task-list" id="review-list"></div>
+        </div>
+        
+        <div class="status-column" id="done-section">
+            <div class="status-header">
+                <span class="status-badge">DONE</span>
+                <span class="status-count" id="done-count">0</span>
+            </div>
+            <div class="task-list" id="done-list"></div>
+        </div>
+    </main>
+    
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <button class="modal-close" aria-label="閉じる" title="閉じる">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <!-- DnDスプラッシュ（大きく3秒表示） -->
+    <div id="status-splash" aria-live="polite" aria-atomic="true">
+        <div class="status-splash-content" id="status-splash-content"></div>
+    </div>
+    <div id="activity-modal" class="modal" aria-modal="true" role="dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">変更履歴</h2>
+                <button class="activity-modal-close" aria-label="閉じる" title="閉じる">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="activity-list" class="activity-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal" aria-modal="true" role="dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">設定</h2>
+                <button class="settings-close" aria-label="閉じる" title="閉じる">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-form">
+                    <div style="margin:10px 0;">
+                        <label>ヘッダータイトル</label>
+                        <input id="settings-title" type="text" placeholder="Stop Midnight Task Viewer" />
+                    </div>
+                    <div style="margin:10px 0;">
+                        <label>あなたの名前</label>
+                        <input id="settings-author-name" type="text" placeholder="表示名" />
+                    </div>
+                    <div style="margin:10px 0;">
+                        <label>テーマ</label>
+                        <div style="display:flex; gap:8px; margin-top:6px;">
+                            <button id="settings-theme-toggle" class="btn">切り替え</button>
+                            <span id="settings-theme-label" style="align-self:center;color:var(--muted);"></span>
+                        </div>
+                    </div>
+                    <div class="modal-toolbar" style="justify-content:flex-end;padding:0;">
+                        <button id="settings-apply" class="btn btn-primary">適用</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="new-task-modal" class="modal" aria-modal="true" role="dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">新規タスク</h2>
+                <button class="new-task-close" aria-label="閉じる" title="閉じる">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-form">
+                    <div style="margin:10px 0; display:flex; gap:8px; align-items:center;">
+                        <label>テンプレート</label>
+                        <select id="new-task-template" class="search-mode-toggle" style="min-width: 160px;">
+                            <option value="custom">カスタム</option>
+                        </select>
+                        <button id="new-task-apply-template" class="btn" title="テンプレを再適用（本文を置換）">再適用</button>
+                    </div>
+                    <div style="margin:10px 0;">
+                        <label>タイトル</label>
+                        <input id="new-task-title" type="text" placeholder="タスク名" />
+                    </div>
+                    <div style="margin:10px 0;">
+                        <label>本文（任意）</label>
+                        <textarea id="new-task-body" placeholder="本文"></textarea>
+                    </div>
+                    <div style="margin:10px 0;">
+                        <label>ステータス</label>
+                        <select id="new-task-status" class="search-mode-toggle">
+                            <option value="todo">TODO</option>
+                            <option value="backlog">BACKLOG</option>
+                            <option value="review">REVIEW</option>
+                            <option value="done">DONE</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="new-task-save" class="btn btn-primary">作成</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- footer removed: 非機能リンクを撤去（今後、機能ボタンを実装予定） -->
+    
+    <script src="viewer.js"></script>
+</body>
+</html>

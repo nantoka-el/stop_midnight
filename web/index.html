@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stop Midnight Mock</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <h1 id="header-title">Stop Midnight</h1>
+      <p id="header-sub" class="app-header__sub"></p>
+    </header>
+
+    <section id="today-view" class="tab-view">
+      <div class="prompt" id="planner-prompt"></div>
+      <div class="today-card" id="planner-card">
+        <div class="today-meta">
+          <div><span id="today-date">2025/09/25</span> ・ 連続達成 <span id="streak-count">3</span>日</div>
+          <div class="badges" id="avoidance-badges"></div>
+        </div>
+        <div class="recommended" id="recommended-area"></div>
+        <label class="field">
+          <span id="planner-label">今夜は何をする？</span>
+          <textarea id="planner-text" rows="3" placeholder="例: 読書30分＋ストレッチ"></textarea>
+        </label>
+        <div class="chips" id="preset-chips"></div>
+        <div class="chip-input">
+          <input type="text" id="chip-input" placeholder="自分の候補を追加">
+          <button type="button" id="chip-add">＋追加</button>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="reminder-toggle" checked>
+          <span>翌朝のフィードバック通知を受け取る</span>
+        </label>
+        <div class="today-actions">
+          <button id="planner-save" class="primary">計画を確定する</button>
+          <button id="switch-to-review" class="ghost">レビュー状態を見る</button>
+        </div>
+      </div>
+
+      <div class="today-card hidden" id="review-card">
+        <div class="today-meta">
+          <div id="review-night-label">対象夜: 9/24 (ログ上は 9/25)</div>
+          <div class="previous-plan" id="previous-plan"></div>
+        </div>
+        <div class="rating-group" id="rating-group">
+          <button data-rating="great">◎</button>
+          <button data-rating="good">○</button>
+          <button data-rating="ok">△</button>
+          <button data-rating="bad">✕</button>
+        </div>
+        <label class="field">
+          <span>今夜はどうだった？</span>
+          <textarea id="review-text" rows="3" placeholder="自由に振り返りを書いてください"></textarea>
+        </label>
+        <div class="checkbox-list" id="avoidance-checks"></div>
+        <label class="field">
+          <span>気分メーター</span>
+          <input type="range" id="mood-slider" min="1" max="5" value="4">
+          <div class="mood-indicator">現在: <span id="mood-value">4</span></div>
+        </label>
+        <div class="today-actions">
+          <button id="review-save" class="primary">レビューを保存</button>
+          <button id="switch-to-plan" class="ghost">プランニングに戻る</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="calendar-view" class="tab-view hidden">
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </section>
+
+    <section id="setting-view" class="tab-view hidden">
+      <form id="setting-form" class="settings-form">
+        <label class="field">
+          <span>名前（呼び名）</span>
+          <input type="text" id="setting-name" required>
+        </label>
+        <label class="field">
+          <span>やめたいこと（カンマ区切り）</span>
+          <input type="text" id="setting-goals" placeholder="闇カジノ, 夜食">
+        </label>
+        <label class="field">
+          <span> Plannerで聞く文言</span>
+          <input type="text" id="setting-planner-label" placeholder="今夜は何をする？">
+        </label>
+        <div class="field-grid">
+          <label class="field">
+            <span>プラン通知（開始〜終了）</span>
+            <input type="time" id="setting-plan-start" value="22:00">
+            <input type="time" id="setting-plan-end" value="23:00">
+          </label>
+          <label class="field">
+            <span>振り返り通知</span>
+            <input type="time" id="setting-review-time" value="04:00">
+          </label>
+          <label class="field">
+            <span>モチベーションリマインド</span>
+            <input type="time" id="setting-motivation-time" value="21:00">
+          </label>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="setting-passcode">
+          <span>パスコードロックを有効にする（モック）</span>
+        </label>
+        <div class="settings-actions">
+          <button type="submit" class="primary">保存（モック）</button>
+          <button type="button" id="setting-reset" class="ghost">リセット</button>
+        </div>
+        <div class="settings-message" id="settings-message"></div>
+      </form>
+    </section>
+  </main>
+
+  <nav class="tab-bar">
+    <button class="tab-bar__item active" data-tab="today">
+      <span class="icon">🌙</span>
+      <span class="label">TODAY</span>
+    </button>
+    <button class="tab-bar__item" data-tab="calendar">
+      <span class="icon">📅</span>
+      <span class="label">Calendar</span>
+    </button>
+    <button class="tab-bar__item" data-tab="setting">
+      <span class="icon">⚙️</span>
+      <span class="label">Setting</span>
+    </button>
+  </nav>
+
+  <div class="modal hidden" id="calendar-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">×</button>
+      <h2 id="modal-date"></h2>
+      <p class="modal-streak"><strong>連続達成</strong><span id="modal-streak"></span></p>
+      <p class="modal-plan"><strong>PLAN</strong><span id="modal-plan"></span></p>
+      <p class="modal-review"><strong>REVIEW</strong><span id="modal-review"></span></p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

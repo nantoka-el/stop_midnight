@@ -1,0 +1,14 @@
+{
+  "name": "stop_midnight",
+  "type": "module",
+  "scripts": {
+    "task-viewer": "node scripts/task-viewer-server.js --port 7777 --root ./docs/logs",
+    "task-viewer:custom": "node scripts/task-viewer-server.js",
+    "gen-index": "node scripts/gen_index.js",
+    "build-views": "node scripts/build_views.js",
+    "gen-tasks-json": "node scripts/generate_tasks_json.js",
+    "logs-refresh": "npm run gen-index && npm run build-views && npm run gen-tasks-json",
+    "task-manager": "npm run logs-refresh && npm run task-viewer"
+  },
+  "devDependencies": {}
+}

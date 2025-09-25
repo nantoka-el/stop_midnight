@@ -1,0 +1,272 @@
+[
+  {
+    "id": "0001",
+    "idRaw": "1",
+    "aliases": [
+      "1"
+    ],
+    "title": "Stop Midnight Task Viewer 導入",
+    "status": "done",
+    "filename": "0001_task_viewer_setup_done.md"
+  },
+  {
+    "id": "0002",
+    "idRaw": "2",
+    "aliases": [
+      "2"
+    ],
+    "title": "目標設定フローの仕様整理",
+    "status": "todo",
+    "filename": "0002_goal_setting_spec_todo.md"
+  },
+  {
+    "id": "0003",
+    "idRaw": "3",
+    "aliases": [
+      "3"
+    ],
+    "title": "コア体験の詳細設計ブレスト",
+    "status": "done",
+    "filename": "0003_core_flow_brainstorm_done.md"
+  },
+  {
+    "id": "0004",
+    "idRaw": "4",
+    "aliases": [
+      "4"
+    ],
+    "title": "プライバシー保護機能の検討",
+    "status": "backlog",
+    "filename": "0004_privacy_guard_backlog.md"
+  },
+  {
+    "id": "0005",
+    "idRaw": "5",
+    "aliases": [
+      "5"
+    ],
+    "title": "FCM通知基盤の設計",
+    "status": "todo",
+    "filename": "0005_fcm_notification_plan_todo.md"
+  },
+  {
+    "id": "0006",
+    "idRaw": "6",
+    "aliases": [
+      "6"
+    ],
+    "title": "Firebase CLI セットアップと初期設定",
+    "status": "review",
+    "filename": "0006_firebase_cli_setup_review.md"
+  },
+  {
+    "id": "0007",
+    "idRaw": "7",
+    "aliases": [
+      "7"
+    ],
+    "title": "Firebase Functions/Firestore 初期ファイルの作成",
+    "status": "done",
+    "filename": "0007_functions_scaffold_done.md"
+  },
+  {
+    "id": "0008",
+    "idRaw": "8",
+    "aliases": [
+      "8"
+    ],
+    "title": "Gitリポジトリ初期化と基本設定",
+    "status": "done",
+    "filename": "0008_git_repo_setup_done.md"
+  },
+  {
+    "id": "0009",
+    "idRaw": "9",
+    "aliases": [
+      "9"
+    ],
+    "title": "TODAYタブのモック実装",
+    "status": "done",
+    "filename": "0009_today_tab_mock_done.md"
+  },
+  {
+    "id": "0010",
+    "idRaw": "10",
+    "aliases": [
+      "10"
+    ],
+    "title": "Calendarタブのモック実装",
+    "status": "done",
+    "filename": "0010_calendar_tab_mock_done.md"
+  },
+  {
+    "id": "0011",
+    "idRaw": "11",
+    "aliases": [
+      "11"
+    ],
+    "title": "Settingタブのモック実装",
+    "status": "done",
+    "filename": "0011_setting_tab_mock_done.md"
+  },
+  {
+    "id": "0012",
+    "idRaw": "12",
+    "aliases": [
+      "12"
+    ],
+    "title": "TODAYタブの追加改善",
+    "status": "done",
+    "filename": "0012_today_enhancements_done.md"
+  },
+  {
+    "id": "0013",
+    "idRaw": "13",
+    "aliases": [
+      "13"
+    ],
+    "title": "Calendarタブの追加改善",
+    "status": "done",
+    "filename": "0013_calendar_enhancements_done.md"
+  },
+  {
+    "id": "0014",
+    "idRaw": "14",
+    "aliases": [
+      "14"
+    ],
+    "title": "Vite + TypeScriptによるフロントエンド実装",
+    "status": "review",
+    "filename": "0014_frontend_impl_review.md"
+  },
+  {
+    "id": "0015",
+    "idRaw": "15",
+    "aliases": [
+      "15"
+    ],
+    "title": "Firebase FCM連携の実装準備",
+    "status": "todo",
+    "filename": "0015_fcm_integration_plan_todo.md"
+  },
+  {
+    "id": "0016",
+    "idRaw": "16",
+    "aliases": [
+      "16"
+    ],
+    "title": "Nodeバージョン設定",
+    "status": "done",
+    "filename": "0016_node_version_setup_done.md"
+  },
+  {
+    "id": "0017",
+    "idRaw": "17",
+    "aliases": [
+      "17"
+    ],
+    "title": "Calendar/Review UI強化",
+    "status": "done",
+    "filename": "0017_calendar_review_enhancements_done.md"
+  },
+  {
+    "id": "0018",
+    "idRaw": "18",
+    "aliases": [
+      "18"
+    ],
+    "title": "ゲーミフィケーション要素の設計・UI反映",
+    "status": "todo",
+    "filename": "0018_gamification_concept_todo.md"
+  },
+  {
+    "id": "0019",
+    "idRaw": "19",
+    "aliases": [
+      "19"
+    ],
+    "title": "TODAYタブの状態可視化とプラン確認",
+    "status": "done",
+    "filename": "0019_today_state_flow_done.md"
+  },
+  {
+    "id": "0020",
+    "idRaw": "20",
+    "aliases": [
+      "20"
+    ],
+    "title": "Calendarモーダルからの編集・削除フロー",
+    "status": "done",
+    "filename": "0020_calendar_edit_flow_done.md"
+  },
+  {
+    "id": "0021",
+    "idRaw": "21",
+    "aliases": [
+      "21"
+    ],
+    "title": "ゲーミフィケーション要素の再設計",
+    "status": "review",
+    "filename": "0021_gamification_deepdive_review.md"
+  },
+  {
+    "id": "0021",
+    "idRaw": "21",
+    "aliases": [
+      "21"
+    ],
+    "title": "リポジトリ全体DeepDive理解",
+    "status": "done",
+    "filename": "0021_repository_deepdive_done.md"
+  },
+  {
+    "id": "0022",
+    "idRaw": "22",
+    "aliases": [
+      "22"
+    ],
+    "title": "タブバーのアクティブ表示改善",
+    "status": "review",
+    "filename": "0022_tabbar_ui_fix_review.md"
+  },
+  {
+    "id": "0023",
+    "idRaw": "23",
+    "aliases": [
+      "23"
+    ],
+    "title": "Calendarセルへの気分表示追加",
+    "status": "done",
+    "filename": "0023_calendar_mood_indicator_done.md"
+  },
+  {
+    "id": "0024",
+    "idRaw": "24",
+    "aliases": [
+      "24"
+    ],
+    "title": "リポジトリ全体DeepDive再読",
+    "status": "todo",
+    "filename": "0024_repository_deepdive_todo.md"
+  },
+  {
+    "id": "0025",
+    "idRaw": "25",
+    "aliases": [
+      "25"
+    ],
+    "title": "TODAY/Calendar UI刷新案策定",
+    "status": "todo",
+    "filename": "0025_ui_refresh_spec_todo.md"
+  },
+  {
+    "id": "0026",
+    "idRaw": "26",
+    "aliases": [
+      "26"
+    ],
+    "title": "FCMプッシュ通知の一気通貫実装",
+    "status": "todo",
+    "filename": "0026_fcm_end_to_end_todo.md"
+  }
+]

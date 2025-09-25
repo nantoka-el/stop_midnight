@@ -1,0 +1,14 @@
+# Node
+node_modules/
+functions/node_modules/
+functions/lib/
+frontend/stop-midnight-app/dist/
+
+# Firebase / debug
+firebase-debug.log
+
+# Viewer-generated artifacts
+/docs/logs/.views/
+
+# macOS
+.DS_Store
