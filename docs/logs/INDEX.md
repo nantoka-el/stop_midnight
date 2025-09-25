@@ -1,10 +1,10 @@
 # Logs INDEX
-*自動生成: 2025/9/26 3:37:17*
+*自動生成: 2025/9/26 5:57:00*
 
 ## 📊 サマリー
 - BACKLOG: 1件
-- TODO: 11件
-- REVIEW: 5件
+- TODO: 10件
+- REVIEW: 6件
 - DONE: 15件
 - 合計: 32件
 
@@ -12,7 +12,7 @@
 
 - **0004: プライバシー保護機能の検討** - [0004_privacy_guard_backlog.md](./tasks/0004_privacy_guard_backlog.md)
 
-## 📝 TODO (11)
+## 📝 TODO (10)
 
 - **0002: 目標設定フローの仕様整理** - [0002_goal_setting_spec_todo.md](./tasks/0002_goal_setting_spec_todo.md)
 - **0005: FCM通知基盤の設計** - [0005_fcm_notification_plan_todo.md](./tasks/0005_fcm_notification_plan_todo.md)
@@ -20,19 +20,19 @@
 - **0018: ゲーミフィケーション要素の設計・UI反映** - [0018_gamification_concept_todo.md](./tasks/0018_gamification_concept_todo.md)
 - **0024: リポジトリ全体DeepDive再読** - [0024_repository_deepdive_todo.md](./tasks/0024_repository_deepdive_todo.md)
 - **0025: TODAY/Calendar UI刷新案策定** - [0025_ui_refresh_spec_todo.md](./tasks/0025_ui_refresh_spec_todo.md)
-- **0027: Firestore連携による夜ログ保存** - [0027_firestore_integration_todo.md](./tasks/0027_firestore_integration_todo.md)
 - **0028: PWAアイコンとmanifest整備** - [0028_pwa_assets_setup_todo.md](./tasks/0028_pwa_assets_setup_todo.md)
 - **0029: プッシュ通知検証とApple Developer準備** - [0029_push_validation_plan_todo.md](./tasks/0029_push_validation_plan_todo.md)
 - **0030: UI再調整と演出ブラッシュアップ** - [0030_ui_polish_secondpass_todo.md](./tasks/0030_ui_polish_secondpass_todo.md)
 - **0031: マルチユーザー対応の設計検討** - [0031_multi_user_design_todo.md](./tasks/0031_multi_user_design_todo.md)
 
-## 🔍 REVIEW (5)
+## 🔍 REVIEW (6)
 
 - **0006: Firebase CLI セットアップと初期設定** - [0006_firebase_cli_setup_review.md](./tasks/0006_firebase_cli_setup_review.md)
 - **0014: Vite + TypeScriptによるフロントエンド実装** - [0014_frontend_impl_review.md](./tasks/0014_frontend_impl_review.md)
 - **0021: ゲーミフィケーション要素の再設計** - [0021_gamification_deepdive_review.md](./tasks/0021_gamification_deepdive_review.md)
 - **0022: タブバーのアクティブ表示改善** - [0022_tabbar_ui_fix_review.md](./tasks/0022_tabbar_ui_fix_review.md)
 - **0026: FCMプッシュ通知の一気通貫実装** - [0026_fcm_end_to_end_review.md](./tasks/0026_fcm_end_to_end_review.md)
+- **0027: Firestore連携による夜ログ保存** - [0027_firestore_integration_review.md](./tasks/0027_firestore_integration_review.md)
 
 ## ✅ DONE (15)
 
