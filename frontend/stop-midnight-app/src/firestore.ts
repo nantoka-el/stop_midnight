@@ -165,6 +165,13 @@ export async function fetchUserSettings(): Promise<Partial<UserSettings>> {
       .filter((item) => item.length > 0)
       .slice(0, 60)
   }
+  if (Array.isArray(data.plannerChips)) {
+    partial.plannerChips = data.plannerChips
+      .filter((item): item is string => typeof item === 'string')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+      .slice(0, 60)
+  }
   if (typeof data.passcodeEnabled === 'boolean') {
     partial.passcodeEnabled = data.passcodeEnabled
   }
@@ -184,7 +191,21 @@ export async function saveUserSettings(settings: UserSettings): Promise<void> {
       reviewPromptTime: settings.reviewPromptTime,
       motivationReminder: settings.motivationReminder,
       gratitudeMessages: settings.gratitudeMessages,
+      plannerChips: settings.plannerChips,
       passcodeEnabled: settings.passcodeEnabled,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  )
+}
+
+export async function savePlannerChips(chips: string[]): Promise<void> {
+  const uid = await ensureAuth()
+  const docRef = doc(db, SETTINGS_COLLECTION, uid)
+  await setDoc(
+    docRef,
+    {
+      plannerChips: chips,
       updatedAt: serverTimestamp(),
     },
     { merge: true },

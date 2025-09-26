@@ -1,7 +1,7 @@
 import './style.css'
 import { getToken, onMessage } from 'firebase/messaging'
 import { getMessagingIfSupported } from './firebase'
-import { deleteNightLog, fetchNightLogs, fetchUserSettings, isPositiveReview, saveNightPlan, saveNightReview, saveUserSettings } from './firestore'
+import { deleteNightLog, fetchNightLogs, fetchUserSettings, isPositiveReview, saveNightPlan, saveNightReview, savePlannerChips, saveUserSettings } from './firestore'
 import type { AppState, NightRecord, ReviewRating, UserSettings } from './types'
 
 import type { RatingSymbol } from './types'
@@ -32,6 +32,7 @@ const defaultSettings: UserSettings = {
   reviewPromptTime: '04:00',
   motivationReminder: { time: '21:00', enabled: true },
   gratitudeMessages: [...DEFAULT_ARIGATEE_MESSAGES],
+  plannerChips: [],
   passcodeEnabled: false,
 }
 
@@ -41,8 +42,8 @@ const state: AppState = {
   todayDate: new Date(),
   todayPlan: {
     text: '',
-    chips: ['読書30分', '湯船に浸かる', '明日の準備', 'ストレッチ'],
-    customChips: [],
+    chips: [],
+    customChips: [...defaultSettings.plannerChips],
   },
   review: {
     pending: true,
@@ -61,6 +62,7 @@ const state: AppState = {
   currentGratitude: DEFAULT_ARIGATEE_MESSAGES[0],
   currentGratitudeIndex: 0,
   records: initialRecords,
+  plannerChips: [...defaultSettings.plannerChips],
 }
 
 loadSelectedDate(state.todayDate)
@@ -83,6 +85,9 @@ function mergeUserSettings(partial: Partial<UserSettings>): UserSettings {
     gratitudeMessages: partial.gratitudeMessages && partial.gratitudeMessages.length > 0
       ? partial.gratitudeMessages
       : defaultSettings.gratitudeMessages,
+    plannerChips: partial.plannerChips && partial.plannerChips.length > 0
+      ? partial.plannerChips
+      : defaultSettings.plannerChips,
     passcodeEnabled: partial.passcodeEnabled ?? defaultSettings.passcodeEnabled,
   }
 }
@@ -95,6 +100,8 @@ function applySettings(settings: UserSettings) {
   state.reviewPromptTime = settings.reviewPromptTime
   state.motivationReminder = { ...settings.motivationReminder }
   state.gratitudeMessages = [...settings.gratitudeMessages]
+  state.todayPlan.customChips = [...settings.plannerChips]
+  state.plannerChips = [...settings.plannerChips]
   state.passcodeEnabled = settings.passcodeEnabled
 }
 
@@ -379,7 +386,6 @@ function loadSelectedDate(date: Date) {
   } else {
     state.todayPlan.text = ''
   }
-  state.todayPlan.customChips = []
 
   if (record?.review) {
     state.review.pending = false
@@ -444,7 +450,7 @@ appRoot.innerHTML = `
         </label>
         <div class="chips" id="preset-chips"></div>
         <div class="chip-input">
-          <input type="text" id="chip-input" placeholder="自分の候補を追加">
+          <input type="text" id="chip-input" placeholder="よく使う項目">
           <button type="button" id="chip-add">＋追加</button>
         </div>
         <label class="toggle">
@@ -710,6 +716,7 @@ function createChipElement(label: string, { removable }: { removable: boolean })
       clearTimer()
       state.todayPlan.customChips = state.todayPlan.customChips.filter((chip) => chip !== label)
       renderPlanner()
+      void persistPlannerChips()
     }
   }
   button.addEventListener('click', (event) => {
@@ -770,22 +777,22 @@ function renderChips() {
   })
 }
 
+async function persistPlannerChips() {
+  try {
+    await savePlannerChips([...state.todayPlan.customChips])
+  } catch (error) {
+    console.error('利用頻度の高い項目の保存に失敗しました', error)
+  }
+}
+
 function renderMoodIcons(container: HTMLDivElement, level: number) {
   container.innerHTML = ''
-  if (level <= 0) {
-    container.classList.add('status-mood--empty')
-    const placeholder = document.createElement('span')
-    placeholder.className = 'status-mood__placeholder'
-    placeholder.textContent = '—'
-    container.appendChild(placeholder)
-    return
-  }
-  container.classList.remove('status-mood--empty')
+  const clamped = Math.max(0, Math.min(level, 5))
+  container.classList.toggle('status-mood--empty', clamped === 0)
   for (let i = 1; i <= 5; i += 1) {
     const span = document.createElement('span')
-    span.className = 'status-mood__icon'
-    span.dataset.active = (i <= level).toString()
-    span.textContent = i <= level ? '★' : '☆'
+    span.className = 'status-mood__dot'
+    span.dataset.active = (i <= clamped).toString()
     container.appendChild(span)
   }
 }
@@ -1080,6 +1087,7 @@ function bindTodayActions() {
     state.todayPlan.customChips.push(value)
     chipInput.value = ''
     renderPlanner()
+    void persistPlannerChips()
   })
 
   qs<HTMLButtonElement>('#planner-save').addEventListener('click', async () => {
@@ -1229,6 +1237,7 @@ function bindSettingsForm() {
         enabled: state.motivationReminder.enabled,
       },
       gratitudeMessages,
+      plannerChips: [...state.todayPlan.customChips],
       passcodeEnabled: settingPasscode.checked,
     }
 

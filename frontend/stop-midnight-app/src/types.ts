@@ -65,6 +65,7 @@ export type UserSettings = {
   reviewPromptTime: string
   motivationReminder: MotivationReminder
   gratitudeMessages: string[]
+  plannerChips: string[]
   passcodeEnabled: boolean
 }
 
@@ -85,4 +86,5 @@ export type AppState = {
   currentGratitude: string
   currentGratitudeIndex: number
   records: Record<string, NightRecord>
+  plannerChips?: string[]
 }
