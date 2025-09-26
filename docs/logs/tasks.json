@@ -276,8 +276,8 @@
       "27"
     ],
     "title": "Firestore連携による夜ログ保存",
-    "status": "review",
-    "filename": "0027_firestore_integration_review.md"
+    "status": "done",
+    "filename": "0027_firestore_integration_done.md"
   },
   {
     "id": "0028",

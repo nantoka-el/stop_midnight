@@ -1,11 +1,11 @@
 # Logs INDEX
-*自動生成: 2025/9/26 5:57:00*
+*自動生成: 2025/9/26 20:46:23*
 
 ## 📊 サマリー
 - BACKLOG: 1件
 - TODO: 10件
-- REVIEW: 6件
-- DONE: 15件
+- REVIEW: 5件
+- DONE: 16件
 - 合計: 32件
 
 ## 📑 BACKLOG (1)
@@ -25,16 +25,15 @@
 - **0030: UI再調整と演出ブラッシュアップ** - [0030_ui_polish_secondpass_todo.md](./tasks/0030_ui_polish_secondpass_todo.md)
 - **0031: マルチユーザー対応の設計検討** - [0031_multi_user_design_todo.md](./tasks/0031_multi_user_design_todo.md)
 
-## 🔍 REVIEW (6)
+## 🔍 REVIEW (5)
 
 - **0006: Firebase CLI セットアップと初期設定** - [0006_firebase_cli_setup_review.md](./tasks/0006_firebase_cli_setup_review.md)
 - **0014: Vite + TypeScriptによるフロントエンド実装** - [0014_frontend_impl_review.md](./tasks/0014_frontend_impl_review.md)
 - **0021: ゲーミフィケーション要素の再設計** - [0021_gamification_deepdive_review.md](./tasks/0021_gamification_deepdive_review.md)
 - **0022: タブバーのアクティブ表示改善** - [0022_tabbar_ui_fix_review.md](./tasks/0022_tabbar_ui_fix_review.md)
 - **0026: FCMプッシュ通知の一気通貫実装** - [0026_fcm_end_to_end_review.md](./tasks/0026_fcm_end_to_end_review.md)
-- **0027: Firestore連携による夜ログ保存** - [0027_firestore_integration_review.md](./tasks/0027_firestore_integration_review.md)
 
-## ✅ DONE (15)
+## ✅ DONE (16)
 
 - **0001: Stop Midnight Task Viewer 導入** - [0001_task_viewer_setup_done.md](./tasks/0001_task_viewer_setup_done.md)
 - **0003: コア体験の詳細設計ブレスト** - [0003_core_flow_brainstorm_done.md](./tasks/0003_core_flow_brainstorm_done.md)
@@ -51,4 +50,5 @@
 - **0020: Calendarモーダルからの編集・削除フロー** - [0020_calendar_edit_flow_done.md](./tasks/0020_calendar_edit_flow_done.md)
 - **0021: リポジトリ全体DeepDive理解** - [0021_repository_deepdive_done.md](./tasks/0021_repository_deepdive_done.md)
 - **0023: Calendarセルへの気分表示追加** - [0023_calendar_mood_indicator_done.md](./tasks/0023_calendar_mood_indicator_done.md)
+- **0027: Firestore連携による夜ログ保存** - [0027_firestore_integration_done.md](./tasks/0027_firestore_integration_done.md)
 
