@@ -1,14 +1,14 @@
 import './style.css'
 import { getToken, onMessage } from 'firebase/messaging'
 import { getMessagingIfSupported } from './firebase'
-import { deleteNightLog, fetchNightLogs, isPositiveReview, saveNightPlan, saveNightReview } from './firestore'
-import type { AppState, NightRecord, ReviewRating } from './types'
+import { deleteNightLog, fetchNightLogs, fetchUserSettings, isPositiveReview, saveNightPlan, saveNightReview, saveUserSettings } from './firestore'
+import type { AppState, NightRecord, ReviewRating, UserSettings } from './types'
 
 import type { RatingSymbol } from './types'
 
 const initialRecords: Record<string, NightRecord> = {}
 
-const state: AppState = {
+const defaultSettings: UserSettings = {
   displayName: 'りんね',
   avoidanceGoals: ['闇カジノ', '夜食'],
   plannerLabel: '今夜は何をする？',
@@ -16,6 +16,10 @@ const state: AppState = {
   reviewPromptTime: '04:00',
   motivationReminder: { time: '21:00', enabled: true },
   passcodeEnabled: false,
+}
+
+const state: AppState = {
+  ...defaultSettings,
   streak: 0,
   todayDate: new Date(),
   todayPlan: {
@@ -53,6 +57,35 @@ const reviewPrompts = [
   '{name}！{date}の夜はどんなだったか教えて！',
   '{name}ちゃん、今夜はどうお過ごしだったかな！聞かせて聞かせて〜！',
 ]
+
+function mergeUserSettings(partial: Partial<UserSettings>): UserSettings {
+  return {
+    displayName: partial.displayName ?? defaultSettings.displayName,
+    avoidanceGoals: partial.avoidanceGoals && partial.avoidanceGoals.length > 0 ? partial.avoidanceGoals : defaultSettings.avoidanceGoals,
+    plannerLabel: partial.plannerLabel ?? defaultSettings.plannerLabel,
+    plannerPromptTimeslot: {
+      start: partial.plannerPromptTimeslot?.start ?? defaultSettings.plannerPromptTimeslot.start,
+      end: partial.plannerPromptTimeslot?.end ?? defaultSettings.plannerPromptTimeslot.end,
+      randomize: partial.plannerPromptTimeslot?.randomize ?? defaultSettings.plannerPromptTimeslot.randomize,
+    },
+    reviewPromptTime: partial.reviewPromptTime ?? defaultSettings.reviewPromptTime,
+    motivationReminder: {
+      time: partial.motivationReminder?.time ?? defaultSettings.motivationReminder.time,
+      enabled: partial.motivationReminder?.enabled ?? defaultSettings.motivationReminder.enabled,
+    },
+    passcodeEnabled: partial.passcodeEnabled ?? defaultSettings.passcodeEnabled,
+  }
+}
+
+function applySettings(settings: UserSettings) {
+  state.displayName = settings.displayName
+  state.avoidanceGoals = [...settings.avoidanceGoals]
+  state.plannerLabel = settings.plannerLabel
+  state.plannerPromptTimeslot = { ...settings.plannerPromptTimeslot }
+  state.reviewPromptTime = settings.reviewPromptTime
+  state.motivationReminder = { ...settings.motivationReminder }
+  state.passcodeEnabled = settings.passcodeEnabled
+}
 
 function qs<T extends HTMLElement>(selector: string): T {
   const element = document.querySelector(selector)
@@ -475,6 +508,17 @@ const STATUS_MAP: Record<TodayStage, { text: string; className: string }> = {
   'review-complete': { text: 'ステータス: レビュー完了', className: 'status-pill status-done' },
 }
 
+function populateSettingsForm() {
+  settingName.value = state.displayName
+  settingGoals.value = state.avoidanceGoals.join(', ')
+  settingPlannerLabel.value = state.plannerLabel
+  settingPlanStart.value = state.plannerPromptTimeslot.start
+  settingPlanEnd.value = state.plannerPromptTimeslot.end
+  settingReviewTime.value = state.reviewPromptTime
+  settingMotivationTime.value = state.motivationReminder.time
+  settingPasscode.checked = state.passcodeEnabled
+}
+
 function updatePlanSummary() {
   const plan = state.todayPlan.text.trim()
   if (plan) {
@@ -603,7 +647,7 @@ function renderPlanner() {
   plannerText.value = state.todayPlan.text
   recommendedBody.textContent = state.todayPlan.recommended
   recommendedArea.dataset.state = 'plan'
-  reminderToggle.checked = true
+  reminderToggle.checked = state.motivationReminder.enabled
 
   presetChips.innerHTML = ''
   const allChips = [...state.todayPlan.chips, ...state.todayPlan.customChips]
@@ -807,6 +851,10 @@ function bindTabBar() {
 }
 
 function bindTodayActions() {
+  reminderToggle.addEventListener('change', () => {
+    state.motivationReminder.enabled = reminderToggle.checked
+  })
+
   qs<HTMLButtonElement>('#chip-add').addEventListener('click', () => {
     const value = chipInput.value.trim()
     if (!value) return
@@ -932,58 +980,61 @@ function deriveStatusFromRating(rating: ReviewRating | null): RatingSymbol {
 }
 
 function bindSettingsForm() {
-  function fillForm() {
-    settingName.value = state.displayName
-    settingGoals.value = state.avoidanceGoals.join(', ')
-    settingPlannerLabel.value = state.plannerLabel
-    settingPlanStart.value = state.plannerPromptTimeslot.start
-    settingPlanEnd.value = state.plannerPromptTimeslot.end
-    settingReviewTime.value = state.reviewPromptTime
-    settingMotivationTime.value = state.motivationReminder.time
-    settingPasscode.checked = state.passcodeEnabled
-  }
+  populateSettingsForm()
 
-  fillForm()
-
-  settingForm.addEventListener('submit', (event) => {
+  settingForm.addEventListener('submit', async (event) => {
     event.preventDefault()
 
-    const name = settingName.value.trim()
-    state.displayName = name || state.displayName
-
+    const name = settingName.value.trim() || state.displayName
     const goals = settingGoals.value
       .split(',')
       .map((goal) => goal.trim())
       .filter((goal) => goal.length > 0)
-    if (goals.length > 0) {
-      state.avoidanceGoals = goals
+    const plannerLabelInput = settingPlannerLabel.value.trim() || state.plannerLabel
+    const planStart = settingPlanStart.value || state.plannerPromptTimeslot.start
+    const planEnd = settingPlanEnd.value || state.plannerPromptTimeslot.end
+    const reviewTime = settingReviewTime.value || state.reviewPromptTime
+    const motivationTime = settingMotivationTime.value || state.motivationReminder.time
+    const avoidanceGoals = goals.length > 0 ? goals : state.avoidanceGoals
+
+    const updatedSettings: UserSettings = {
+      displayName: name,
+      avoidanceGoals,
+      plannerLabel: plannerLabelInput,
+      plannerPromptTimeslot: {
+        start: planStart,
+        end: planEnd,
+        randomize: state.plannerPromptTimeslot.randomize,
+      },
+      reviewPromptTime: reviewTime,
+      motivationReminder: {
+        time: motivationTime,
+        enabled: state.motivationReminder.enabled,
+      },
+      passcodeEnabled: settingPasscode.checked,
     }
 
-    const newLabel = settingPlannerLabel.value.trim()
-    if (newLabel) {
-      state.plannerLabel = newLabel
+    try {
+      applySettings(updatedSettings)
+      renderPlanner()
+      renderReview()
+      updateHeaderForTab(currentTab)
+      populateSettingsForm()
+      settingsMessage.textContent = '保存中...'
+      await saveUserSettings(updatedSettings)
+      settingsMessage.textContent = '保存しました'
+    } catch (error) {
+      console.error('設定の保存に失敗しました', error)
+      settingsMessage.textContent = '保存に失敗しました'
+    } finally {
+      window.setTimeout(() => {
+        settingsMessage.textContent = ''
+      }, 2000)
     }
-
-    state.plannerPromptTimeslot = {
-      start: settingPlanStart.value || state.plannerPromptTimeslot.start,
-      end: settingPlanEnd.value || state.plannerPromptTimeslot.end,
-      randomize: state.plannerPromptTimeslot.randomize,
-    }
-
-    state.reviewPromptTime = settingReviewTime.value || state.reviewPromptTime
-    state.motivationReminder.time = settingMotivationTime.value || state.motivationReminder.time
-    state.passcodeEnabled = settingPasscode.checked
-
-    renderPlanner()
-    renderReview()
-    settingsMessage.textContent = '保存しました（モック）'
-    window.setTimeout(() => {
-      settingsMessage.textContent = ''
-    }, 2000)
   })
 
   qs<HTMLButtonElement>('#setting-reset').addEventListener('click', () => {
-    fillForm()
+    populateSettingsForm()
     settingsMessage.textContent = 'リセットしました'
     window.setTimeout(() => {
       settingsMessage.textContent = ''
@@ -1136,6 +1187,20 @@ async function hydrateNightLogs() {
   }
 }
 
+async function hydrateUserSettings() {
+  try {
+    const partial = await fetchUserSettings()
+    const merged = mergeUserSettings(partial)
+    applySettings(merged)
+    renderPlanner()
+    renderReview()
+    populateSettingsForm()
+    updateHeaderForTab(currentTab)
+  } catch (error) {
+    console.error('ユーザー設定の取得に失敗しました', error)
+  }
+}
+
 function bindModal() {
   qs<HTMLButtonElement>('#modal-close').addEventListener('click', closeModal)
   modal.addEventListener('click', (event) => {
@@ -1180,6 +1245,7 @@ function init() {
     void sendTestNotification()
   })
   void setupPushMessaging()
+  void hydrateUserSettings()
   void hydrateNightLogs()
 }
 

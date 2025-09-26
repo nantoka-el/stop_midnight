@@ -58,6 +58,16 @@ export type Achievement = {
   category: 'streak' | 'habit' | 'recovery'
 }
 
+export type UserSettings = {
+  displayName: string
+  avoidanceGoals: string[]
+  plannerLabel: string
+  plannerPromptTimeslot: PlannerTimeslot
+  reviewPromptTime: string
+  motivationReminder: MotivationReminder
+  passcodeEnabled: boolean
+}
+
 export type AppState = {
   displayName: string
   avoidanceGoals: string[]
