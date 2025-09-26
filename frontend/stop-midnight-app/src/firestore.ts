@@ -158,6 +158,13 @@ export async function fetchUserSettings(): Promise<Partial<UserSettings>> {
       partial.motivationReminder = { time, enabled }
     }
   }
+  if (Array.isArray(data.gratitudeMessages)) {
+    partial.gratitudeMessages = data.gratitudeMessages
+      .filter((item): item is string => typeof item === 'string')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+      .slice(0, 60)
+  }
   if (typeof data.passcodeEnabled === 'boolean') {
     partial.passcodeEnabled = data.passcodeEnabled
   }
@@ -176,6 +183,7 @@ export async function saveUserSettings(settings: UserSettings): Promise<void> {
       plannerPromptTimeslot: settings.plannerPromptTimeslot,
       reviewPromptTime: settings.reviewPromptTime,
       motivationReminder: settings.motivationReminder,
+      gratitudeMessages: settings.gratitudeMessages,
       passcodeEnabled: settings.passcodeEnabled,
       updatedAt: serverTimestamp(),
     },

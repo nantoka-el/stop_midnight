@@ -16,7 +16,6 @@ export type TodayPlan = {
   text: string
   chips: string[]
   customChips: string[]
-  recommended: string
 }
 
 export type ReviewState = {
@@ -65,6 +64,7 @@ export type UserSettings = {
   plannerPromptTimeslot: PlannerTimeslot
   reviewPromptTime: string
   motivationReminder: MotivationReminder
+  gratitudeMessages: string[]
   passcodeEnabled: boolean
 }
 
@@ -81,5 +81,7 @@ export type AppState = {
   todayPlan: TodayPlan
   review: ReviewState
   achievements: Achievement[]
+  gratitudeMessages: string[]
+  currentGratitude: string
   records: Record<string, NightRecord>
 }

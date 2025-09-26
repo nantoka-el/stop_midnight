@@ -6,6 +6,22 @@ import type { AppState, NightRecord, ReviewRating, UserSettings } from './types'
 
 import type { RatingSymbol } from './types'
 
+const PLAN_PLACEHOLDERS = [
+  '読書20分＋日記で頭を整える',
+  '夜食の代わりにハーブティーを淹れる',
+  'スマホはリビングに置いてストレッチ15分',
+  '明日の準備と簡単な片付けで締めくくる',
+  '軽いヨガと深呼吸で体をリセットする',
+]
+
+const DEFAULT_GRATITUDE_MESSAGES = [
+  '夜が楽しくても、明日の自分が困らないようにね。',
+  '欲望に引っ張られそうになったら、ゆっくり深呼吸。',
+  '眠る前の30分だけ、未来の自分のために使ってみよう。',
+  '闇カジノより、静かな時間の方が強い。今日もそれを証明しよう。',
+  '深酒は簡単、でも早起きはもっと気持ちいい。',
+]
+
 const initialRecords: Record<string, NightRecord> = {}
 
 const defaultSettings: UserSettings = {
@@ -15,6 +31,7 @@ const defaultSettings: UserSettings = {
   plannerPromptTimeslot: { start: '22:00', end: '23:00', randomize: true },
   reviewPromptTime: '04:00',
   motivationReminder: { time: '21:00', enabled: true },
+  gratitudeMessages: [...DEFAULT_GRATITUDE_MESSAGES],
   passcodeEnabled: false,
 }
 
@@ -26,7 +43,6 @@ const state: AppState = {
     text: '',
     chips: ['読書30分', '湯船に浸かる', '明日の準備', 'ストレッチ'],
     customChips: [],
-    recommended: '先週はストレッチが連続達成。今夜も続けてみる？',
   },
   review: {
     pending: true,
@@ -41,22 +57,12 @@ const state: AppState = {
     { id: 'habit-avoid-10', title: '誘惑バスター', description: '夜の誘惑を10回回避しよう', icon: '🛡️', unlocked: false, progress: 6, goal: 10, category: 'habit' },
     { id: 'recovery-1', title: 'リカバリー成功', description: '連続達成が途切れた翌日に立て直す', icon: '🔄', unlocked: false, progress: 0, goal: 1, category: 'recovery' },
   ],
+  gratitudeMessages: [...DEFAULT_GRATITUDE_MESSAGES],
+  currentGratitude: DEFAULT_GRATITUDE_MESSAGES[0],
   records: initialRecords,
 }
 
 loadSelectedDate(state.todayDate)
-
-const plannerPrompts = [
-  '{name}さん！今日のやることを聞かせて下さい！',
-  '{name}！とりあえず、今日のやることをここに書く。それから夜を過ごそう',
-  '{name}ちゃん、今日のやることはもう決まってる？ゆっくり考えよう',
-]
-
-const reviewPrompts = [
-  '{name}さん、{date}の夜は結局どうしてたの？',
-  '{name}！{date}の夜はどんなだったか教えて！',
-  '{name}ちゃん、今夜はどうお過ごしだったかな！聞かせて聞かせて〜！',
-]
 
 function mergeUserSettings(partial: Partial<UserSettings>): UserSettings {
   return {
@@ -73,6 +79,9 @@ function mergeUserSettings(partial: Partial<UserSettings>): UserSettings {
       time: partial.motivationReminder?.time ?? defaultSettings.motivationReminder.time,
       enabled: partial.motivationReminder?.enabled ?? defaultSettings.motivationReminder.enabled,
     },
+    gratitudeMessages: partial.gratitudeMessages && partial.gratitudeMessages.length > 0
+      ? partial.gratitudeMessages
+      : defaultSettings.gratitudeMessages,
     passcodeEnabled: partial.passcodeEnabled ?? defaultSettings.passcodeEnabled,
   }
 }
@@ -84,6 +93,7 @@ function applySettings(settings: UserSettings) {
   state.plannerPromptTimeslot = { ...settings.plannerPromptTimeslot }
   state.reviewPromptTime = settings.reviewPromptTime
   state.motivationReminder = { ...settings.motivationReminder }
+  state.gratitudeMessages = [...settings.gratitudeMessages]
   state.passcodeEnabled = settings.passcodeEnabled
 }
 
@@ -121,6 +131,104 @@ function parseTimestamp(value: string): Date | undefined {
 
 function formatMonthDay(date: Date): string {
   return `${date.getMonth() + 1}/${date.getDate()}`
+}
+
+function getMonday(date: Date): Date {
+  const result = new Date(date)
+  const day = result.getDay()
+  const diff = (day + 6) % 7
+  result.setDate(result.getDate() - diff)
+  result.setHours(0, 0, 0, 0)
+  return result
+}
+
+function formatWeekdayShort(date: Date): string {
+  const weekdays = ['日', '月', '火', '水', '木', '金', '土']
+  return weekdays[date.getDay()]
+}
+
+function formatFullDateTime(date: Date, reference: Date): string {
+  const month = `${date.getMonth() + 1}`
+  const day = `${date.getDate()}`
+  const weekday = formatWeekdayShort(date)
+  const hours = `${reference.getHours()}`.padStart(2, '0')
+  const minutes = `${reference.getMinutes()}`.padStart(2, '0')
+  return `${month}/${day} (${weekday}) ${hours}:${minutes}`
+}
+
+let openingTypingTimer: number | undefined
+let openingHideTimer: number | undefined
+
+function updateDateTimeDisplay() {
+  const now = new Date()
+  const label = formatFullDateTime(state.todayDate, now)
+  todayInfo.textContent = label
+  if (currentTab === 'today') {
+    headerTime.textContent = label
+  }
+}
+
+function chooseGratitudeMessage(): string {
+  const pool = state.gratitudeMessages.length > 0 ? state.gratitudeMessages : DEFAULT_GRATITUDE_MESSAGES
+  return pool[Math.floor(Math.random() * pool.length)] ?? DEFAULT_GRATITUDE_MESSAGES[0]
+}
+
+function updateGratitudeMessage(message: string) {
+  state.currentGratitude = message
+  gratitudeMessageEl.textContent = message
+}
+
+function showOpeningScreen(message: string) {
+  hideOpeningScreen()
+  updateGratitudeMessage(message)
+  openingScreen.classList.remove('hidden')
+  openingScreen.setAttribute('aria-hidden', 'false')
+  openingText.textContent = ''
+  const chars = Array.from(message)
+  if (chars.length === 0) {
+    openingHideTimer = window.setTimeout(() => hideOpeningScreen(), 500)
+    return
+  }
+  let index = 0
+  const intervalMs = 250 // 1秒あたり4文字
+  openingTypingTimer = window.setInterval(() => {
+    openingText.textContent += chars[index]
+    index += 1
+    if (index >= chars.length) {
+      if (openingTypingTimer !== undefined) {
+        window.clearInterval(openingTypingTimer)
+        openingTypingTimer = undefined
+      }
+      openingHideTimer = window.setTimeout(() => hideOpeningScreen(), 2000)
+    }
+  }, intervalMs)
+}
+
+function hideOpeningScreen() {
+  if (openingTypingTimer !== undefined) {
+    window.clearInterval(openingTypingTimer)
+    openingTypingTimer = undefined
+  }
+  if (openingHideTimer !== undefined) {
+    window.clearTimeout(openingHideTimer)
+    openingHideTimer = undefined
+  }
+  openingScreen.classList.add('hidden')
+  openingScreen.setAttribute('aria-hidden', 'true')
+}
+
+function refreshGratitudeMessage(options: { showOpening?: boolean } = {}) {
+  const message = chooseGratitudeMessage()
+  if (options.showOpening) {
+    showOpeningScreen(message)
+  } else {
+    updateGratitudeMessage(message)
+  }
+}
+
+function refreshTodayView() {
+  updateDateTimeDisplay()
+  renderAchievements()
 }
 
 function getRecord(dateKey: string, create = false): NightRecord | undefined {
@@ -210,72 +318,33 @@ function deriveRatingFromSymbol(symbol: RatingSymbol | null): ReviewRating | nul
   }
 }
 
-function randomPrompt(list: string[], name: string, dateLabel?: string): string {
-  const template = list[Math.floor(Math.random() * list.length)]
-  return template.replace('{name}', name).replace('{date}', dateLabel ?? '')
-}
-
 const appRoot = qs<HTMLDivElement>('#app')
 
 appRoot.innerHTML = `
+  <div class="app-overlay hidden" id="opening-screen" aria-hidden="true">
+    <div class="opening-content">
+      <span id="opening-text"></span>
+    </div>
+  </div>
   <main class="app-shell">
     <header class="app-header">
       <h1 id="header-title">Stop Midnight</h1>
-      <p id="header-sub" class="app-header__sub"></p>
-      <div class="hero" id="hero-card">
-        <div class="hero__streak">
-          <span class="hero__label">連続継続</span>
-          <span class="hero__count" id="hero-streak-count">0</span>
-          <span class="hero__unit">日</span>
-          <div class="hero__next" id="hero-next-target"></div>
-        </div>
-        <div class="hero__state" id="today-state-badge" data-state="plan">
-          <span class="hero__state-icon" id="today-state-icon">📝</span>
-          <div class="hero__state-text">
-            <span class="hero__state-label" id="today-state-label">PLANモード</span>
-            <small id="today-state-desc">今夜の計画を決めましょう</small>
-          </div>
-        </div>
+      <div class="header-meta">
+        <span id="header-time" class="header-time"></span>
       </div>
-      <div class="achievement-strip" id="achievement-strip"></div>
-      <div class="next-target" id="next-target"></div>
+      <p id="gratitude-message" class="gratitude-message"></p>
     </header>
 
     <section id="today-view" class="tab-view active">
-      <div class="today-steps" id="today-steps">
-        <div class="today-step" data-step="plan">
-          <span class="today-step__number">1</span>
-          <span class="today-step__label">PLAN</span>
-        </div>
-        <div class="today-step" data-step="review">
-          <span class="today-step__number">2</span>
-          <span class="today-step__label">REVIEW</span>
-        </div>
-      </div>
-      <div class="status-pill" id="today-status"></div>
-      <div class="plan-summary hidden" id="plan-summary">
-        <div class="plan-summary__header">
-          <span class="plan-summary__title">今日の計画</span>
-          <button type="button" id="plan-summary-edit" class="ghost small">編集する</button>
-        </div>
-        <p id="plan-summary-text"></p>
-      </div>
-      <div class="prompt" id="planner-prompt"></div>
       <div class="today-card" id="planner-card">
-        <div class="today-meta">
-          <div><span id="today-date">--</span> ・ 連続達成 <span id="streak-count">0</span>日</div>
+        <div class="today-header">
+          <div class="today-header__datetime" id="today-info">--</div>
+          <div class="today-header__streak" id="today-streak"></div>
           <div class="badges" id="avoidance-badges"></div>
-        </div>
-        <div class="recommended" id="recommended-area">
-          <div class="recommended__header">
-            <span class="recommended__icon">✨</span>
-            <span class="recommended__title">リコメンド</span>
-          </div>
-          <div class="recommended__body" id="recommended-body"></div>
         </div>
         <label class="field">
           <span id="planner-label">今夜は何をする？</span>
-          <textarea id="planner-text" rows="3" placeholder="例: 読書30分＋ストレッチ"></textarea>
+          <textarea id="planner-text" rows="6" placeholder=""></textarea>
         </label>
         <div class="chips" id="preset-chips"></div>
         <div class="chip-input">
@@ -319,9 +388,17 @@ appRoot.innerHTML = `
           <button id="switch-to-plan" class="ghost">プランニングに戻る</button>
         </div>
       </div>
+
+      <div class="today-footer" id="today-footer">
+        <div class="achievement-strip" id="achievement-strip"></div>
+        <div class="next-target" id="next-target"></div>
+      </div>
     </section>
 
     <section id="calendar-view" class="tab-view hidden">
+      <div class="calendar-weekdays">
+        <span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span>
+      </div>
       <div class="calendar-grid" id="calendar-grid"></div>
     </section>
 
@@ -354,6 +431,10 @@ appRoot.innerHTML = `
             <input type="time" id="setting-motivation-time" value="21:00">
           </label>
         </div>
+        <label class="field">
+          <span>ありがたい言葉（改行ごとに1つ、最大60行）</span>
+          <textarea id="setting-gratitude" rows="7" placeholder="賢い時の自分から夜の自分へ伝えたい言葉"></textarea>
+        </label>
         <label class="toggle">
           <input type="checkbox" id="setting-passcode">
           <span>パスコードロックを有効にする（モック）</span>
@@ -410,34 +491,22 @@ appRoot.innerHTML = `
 `
 
 const headerTitle = qs<HTMLHeadingElement>('#header-title')
-const headerSub = qs<HTMLParagraphElement>('#header-sub')
-const heroCard = qs<HTMLDivElement>('#hero-card')
-const heroStreakCount = qs<HTMLSpanElement>('#hero-streak-count')
-const heroNextTarget = qs<HTMLDivElement>('#hero-next-target')
-const todayStateBadge = qs<HTMLDivElement>('#today-state-badge')
-const todayStateIcon = qs<HTMLSpanElement>('#today-state-icon')
-const todayStateLabel = qs<HTMLSpanElement>('#today-state-label')
-const todayStateDesc = qs<HTMLSpanElement>('#today-state-desc')
-const achievementStrip = qs<HTMLDivElement>('#achievement-strip')
-const nextTargetMessage = qs<HTMLDivElement>('#next-target')
-const plannerPrompt = qs<HTMLDivElement>('#planner-prompt')
-const todayDateEl = qs<HTMLSpanElement>('#today-date')
-const todaySteps = Array.from(document.querySelectorAll<HTMLElement>('.today-step'))
-const statusPill = qs<HTMLDivElement>('#today-status')
-const planSummaryCard = qs<HTMLDivElement>('#plan-summary')
-const planSummaryText = qs<HTMLParagraphElement>('#plan-summary-text')
-const planSummaryEdit = qs<HTMLButtonElement>('#plan-summary-edit')
-const streakCount = qs<HTMLSpanElement>('#streak-count')
-const badgesWrap = qs<HTMLDivElement>('#avoidance-badges')
-const recommendedArea = qs<HTMLDivElement>('#recommended-area')
-const recommendedBody = qs<HTMLDivElement>('#recommended-body')
+const headerTime = qs<HTMLSpanElement>('#header-time')
+const gratitudeMessageEl = qs<HTMLParagraphElement>('#gratitude-message')
+const openingScreen = qs<HTMLDivElement>('#opening-screen')
+const openingText = qs<HTMLSpanElement>('#opening-text')
+const plannerCard = qs<HTMLDivElement>('#planner-card')
+const reviewCard = qs<HTMLDivElement>('#review-card')
 const plannerLabel = qs<HTMLSpanElement>('#planner-label')
 const plannerText = qs<HTMLTextAreaElement>('#planner-text')
 const presetChips = qs<HTMLDivElement>('#preset-chips')
 const chipInput = qs<HTMLInputElement>('#chip-input')
 const reminderToggle = qs<HTMLInputElement>('#reminder-toggle')
-const plannerCard = qs<HTMLDivElement>('#planner-card')
-const reviewCard = qs<HTMLDivElement>('#review-card')
+const badgesWrap = qs<HTMLDivElement>('#avoidance-badges')
+const todayInfo = qs<HTMLDivElement>('#today-info')
+const todayStreak = qs<HTMLDivElement>('#today-streak')
+const achievementStrip = qs<HTMLDivElement>('#achievement-strip')
+const nextTargetMessage = qs<HTMLDivElement>('#next-target')
 const reviewNightLabel = qs<HTMLDivElement>('#review-night-label')
 const previousPlanEl = qs<HTMLDivElement>('#previous-plan')
 const reviewMetaInfo = qs<HTMLDivElement>('#review-meta-info')
@@ -465,12 +534,14 @@ const settingPlanStart = qs<HTMLInputElement>('#setting-plan-start')
 const settingPlanEnd = qs<HTMLInputElement>('#setting-plan-end')
 const settingReviewTime = qs<HTMLInputElement>('#setting-review-time')
 const settingMotivationTime = qs<HTMLInputElement>('#setting-motivation-time')
+const settingGratitude = qs<HTMLTextAreaElement>('#setting-gratitude')
 const settingPasscode = qs<HTMLInputElement>('#setting-passcode')
 const settingsMessage = qs<HTMLDivElement>('#settings-message')
 const pushSetup = qs<HTMLDivElement>('#push-setup')
 const pushStatus = qs<HTMLSpanElement>('#push-status')
 const pushRequestButton = qs<HTMLButtonElement>('#push-request-permission')
 const pushTestButton = qs<HTMLButtonElement>('#push-send-test')
+
 
 let currentTodayView: 'plan' | 'review' = 'plan'
 let currentTab: 'today' | 'calendar' | 'setting' = 'today'
@@ -480,32 +551,15 @@ const FUNCTIONS_BASE_URL = import.meta.env.VITE_FUNCTIONS_BASE_URL ?? 'https://a
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY
 
 headerTitle.textContent = 'Stop Midnight'
-document.documentElement.dataset.todayState = 'plan'
 
 function updateHeaderForTab(tab: 'today' | 'calendar' | 'setting') {
-  if (tab === 'today') {
-    headerSub.textContent = `${state.displayName}さん、夜の悪癖を今日で止めよう。連続${state.streak}日継続中。`
-  } else if (tab === 'calendar') {
-    headerSub.textContent = '過去の夜を振り返って、明日に繋げよう。'
+  if (tab === 'calendar') {
+    headerTime.textContent = 'Calendar'
+  } else if (tab === 'setting') {
+    headerTime.textContent = 'Setting'
   } else {
-    headerSub.textContent = '設定を見直して、自分にフィットさせよう。'
+    updateDateTimeDisplay()
   }
-}
-
-type TodayStage = 'plan-empty' | 'review-pending' | 'review-complete'
-
-function getTodayStage(): TodayStage {
-  const hasPlan = state.todayPlan.text.trim().length > 0
-  if (!hasPlan) {
-    return 'plan-empty'
-  }
-  return state.review.pending ? 'review-pending' : 'review-complete'
-}
-
-const STATUS_MAP: Record<TodayStage, { text: string; className: string }> = {
-  'plan-empty': { text: 'ステータス: プラン入力待ち', className: 'status-pill status-plan' },
-  'review-pending': { text: 'ステータス: レビュー待ち (プラン済み)', className: 'status-pill status-review' },
-  'review-complete': { text: 'ステータス: レビュー完了', className: 'status-pill status-done' },
 }
 
 function populateSettingsForm() {
@@ -516,80 +570,8 @@ function populateSettingsForm() {
   settingPlanEnd.value = state.plannerPromptTimeslot.end
   settingReviewTime.value = state.reviewPromptTime
   settingMotivationTime.value = state.motivationReminder.time
+  settingGratitude.value = state.gratitudeMessages.join('\n')
   settingPasscode.checked = state.passcodeEnabled
-}
-
-function updatePlanSummary() {
-  const plan = state.todayPlan.text.trim()
-  if (plan) {
-    planSummaryCard.classList.remove('hidden')
-    const key = formatDateKey(state.todayDate)
-    const record = getRecord(key)
-    const updatedAt = record?.plan?.updatedAt ? `\n更新: ${record.plan.updatedAt}` : ''
-    planSummaryText.textContent = `${plan}${updatedAt}`
-  } else {
-    planSummaryCard.classList.add('hidden')
-    planSummaryText.textContent = ''
-  }
-}
-
-function updateStepIndicators(stage: TodayStage) {
-  const planStep = todaySteps.find((el) => el.dataset.step === 'plan')
-  const reviewStep = todaySteps.find((el) => el.dataset.step === 'review')
-  todaySteps.forEach((step) => step.classList.remove('is-current', 'is-complete'))
-
-  if (planStep) {
-    if (stage !== 'plan-empty') {
-      planStep.classList.add('is-complete')
-    }
-    if (currentTodayView === 'plan' || stage === 'plan-empty') {
-      planStep.classList.add('is-current')
-    }
-  }
-
-  if (reviewStep) {
-    if (stage === 'review-complete') {
-      reviewStep.classList.add('is-complete')
-    }
-    if (currentTodayView === 'review') {
-      reviewStep.classList.add('is-current')
-    }
-  }
-}
-
-function updateStatusPill(stage: TodayStage) {
-  const info = STATUS_MAP[stage]
-  statusPill.className = info.className
-  statusPill.textContent = info.text
-}
-
-function updateTodayUI() {
-  const stage = getTodayStage()
-  updatePlanSummary()
-  updateStepIndicators(stage)
-  updateStatusPill(stage)
-  updateTodayStateBadge(stage)
-  updateShellTheme(stage)
-}
-
-function updateTodayStateBadge(stage: TodayStage) {
-  const isPlanStage = stage === 'plan-empty' || currentTodayView === 'plan'
-  const stateKey = isPlanStage ? 'plan' : 'review'
-  todayStateBadge.dataset.state = stateKey
-  todayStateIcon.textContent = isPlanStage ? '📝' : '🌅'
-  todayStateLabel.textContent = isPlanStage ? 'PLANモード' : 'REVIEWモード'
-  todayStateDesc.textContent = isPlanStage ? '今夜の計画を決めましょう' : '昨夜の振り返りを記録しましょう'
-}
-
-function updateShellTheme(stage: TodayStage) {
-  if (currentTab !== 'today') {
-    document.documentElement.dataset.todayState = 'neutral'
-    heroCard.dataset.state = 'plan'
-    return
-  }
-  const themeState = stage === 'review-complete' || currentTodayView === 'review' ? 'review' : 'plan'
-  document.documentElement.dataset.todayState = themeState
-  heroCard.dataset.state = themeState
 }
 
 function renderAchievements() {
@@ -621,20 +603,75 @@ function renderNextTargetMessage() {
   const pending = state.achievements.filter((ach) => !ach.unlocked)
   if (pending.length === 0) {
     nextTargetMessage.textContent = '称号コンプリート！おめでとうございます 🎉'
-    heroNextTarget.textContent = '目標達成ずみ！すばらしい！'
     return
   }
   const next = pending.reduce((best, curr) => (curr.progress / curr.goal) > (best.progress / best.goal) ? curr : best)
   const remaining = Math.max(next.goal - next.progress, 0)
   const percent = Math.min((next.progress / next.goal) * 100, 100).toFixed(0)
   nextTargetMessage.textContent = `${next.title} まであと ${remaining}。進捗 ${percent}%`
-  heroNextTarget.textContent = `次は ${next.title} まであと ${remaining}`
+}
+
+function setPlannerPlaceholder() {
+  if (state.todayPlan.text.trim().length > 0) {
+    plannerText.placeholder = ''
+    return
+  }
+  const sample = PLAN_PLACEHOLDERS[Math.floor(Math.random() * PLAN_PLACEHOLDERS.length)]
+  plannerText.placeholder = sample
+}
+
+function createChipElement(label: string, { removable }: { removable: boolean }): HTMLButtonElement {
+  const button = document.createElement('button')
+  button.type = 'button'
+  button.className = 'chip'
+  button.textContent = label
+  const appendChip = () => {
+    const existing = plannerText.value
+    const needsNewline = existing.trim().length > 0
+    plannerText.value = needsNewline ? `${existing}\n${label}` : label
+  }
+  let longPressTimer: number | undefined
+  const clearTimer = () => {
+    if (longPressTimer !== undefined) {
+      window.clearTimeout(longPressTimer)
+      longPressTimer = undefined
+    }
+  }
+  const handleRemoval = () => {
+    if (!removable) return
+    if (window.confirm(`"${label}" を削除しますか？`)) {
+      button.dataset.removing = 'true'
+      clearTimer()
+      state.todayPlan.customChips = state.todayPlan.customChips.filter((chip) => chip !== label)
+      renderPlanner()
+    }
+  }
+  button.addEventListener('click', (event) => {
+    if (button.dataset.removing === 'true') {
+      return
+    }
+    if (removable && event.altKey) {
+      handleRemoval()
+    } else {
+      appendChip()
+    }
+  })
+  if (removable) {
+    button.addEventListener('pointerdown', () => {
+      clearTimer()
+      longPressTimer = window.setTimeout(() => {
+        longPressTimer = undefined
+        handleRemoval()
+      }, 600)
+    })
+    button.addEventListener('pointerup', clearTimer)
+    button.addEventListener('pointerleave', clearTimer)
+  }
+  return button
 }
 
 function renderPlanner() {
-  heroStreakCount.textContent = `${state.streak}`
-  todayDateEl.textContent = formatDate(state.todayDate)
-  streakCount.textContent = `${state.streak}`
+  updateDateTimeDisplay()
   badgesWrap.innerHTML = ''
   state.avoidanceGoals.forEach((goal) => {
     const badge = document.createElement('span')
@@ -645,39 +682,37 @@ function renderPlanner() {
 
   plannerLabel.textContent = state.plannerLabel
   plannerText.value = state.todayPlan.text
-  recommendedBody.textContent = state.todayPlan.recommended
-  recommendedArea.dataset.state = 'plan'
+  setPlannerPlaceholder()
   reminderToggle.checked = state.motivationReminder.enabled
 
+  todayStreak.textContent = state.streak > 0 ? `連続${state.streak}日 継続中` : '今日から再スタート'
+
+  renderChips()
+  refreshTodayView()
+}
+
+function renderChips() {
   presetChips.innerHTML = ''
-  const allChips = [...state.todayPlan.chips, ...state.todayPlan.customChips]
-  allChips.forEach((chip) => {
-    const button = document.createElement('button')
-    button.type = 'button'
-    button.className = 'chip'
-    button.textContent = chip
-    button.addEventListener('click', () => {
-      const existing = plannerText.value.trim()
-      plannerText.value = existing ? `${existing}\n${chip}` : chip
-    })
+  state.todayPlan.chips.forEach((chip) => {
+    const button = createChipElement(chip, { removable: false })
     presetChips.appendChild(button)
   })
-
-  const prompt = randomPrompt(plannerPrompts, state.displayName)
-  plannerPrompt.textContent = prompt
-  plannerPrompt.dataset.type = 'plan'
-  updateTodayUI()
+  state.todayPlan.customChips.forEach((chip) => {
+    const button = createChipElement(chip, { removable: true })
+    button.dataset.custom = 'true'
+    presetChips.appendChild(button)
+  })
 }
 
 function renderReview() {
+  updateDateTimeDisplay()
   const dateLabel = formatMonthDay(state.todayDate)
-
+  todayStreak.textContent = state.streak > 0 ? `連続${state.streak}日 継続中` : '今日から再スタート'
   reviewNightLabel.textContent = `対象夜: ${dateLabel} (ログ上は ${formatDate(state.todayDate)})`
   previousPlanEl.textContent = `計画: ${state.todayPlan.text || '未入力'}`
   reviewText.value = state.review.notes
   moodSlider.value = `${state.review.mood}`
   moodValue.textContent = `${state.review.mood}`
-  recommendedArea.dataset.state = 'review'
 
   reviewMetaInfo.textContent = state.review.reviewTimestamp
     ? `最終保存: ${formatDate(state.review.reviewTimestamp)} ${state.review.reviewTimestamp.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`
@@ -708,49 +743,82 @@ function renderReview() {
     const rating = button.dataset.rating as ReviewRating | undefined
     button.classList.toggle('active', rating !== undefined && rating === state.review.rating)
   })
-
-  const prompt = randomPrompt(reviewPrompts, state.displayName, dateLabel)
-  plannerPrompt.textContent = prompt
-  plannerPrompt.dataset.type = 'review'
-  updateTodayUI()
+  refreshTodayView()
 }
 
 let activeModalDateKey: string | null = null
 
 function renderCalendar() {
   calendarGrid.innerHTML = ''
-  const entries = Object.entries(state.records).sort((a, b) => a[0].localeCompare(b[0]))
-  entries.forEach(([dateKey, record]) => {
-    const cell = document.createElement('div')
-    cell.className = 'calendar-cell'
-    const moodLevel = record.review?.mood ?? 0
-    cell.dataset.state = record.review ? 'recorded' : 'blank'
-    cell.dataset.mood = moodLevel ? `m${moodLevel}` : 'none'
+  const entryList = Object.entries(state.records).map(([dateKey, record]) => ({
+    key: dateKey,
+    record,
+    date: parseDateKeyToDate(dateKey),
+  }))
+  entryList.sort((a, b) => a.date.getTime() - b.date.getTime())
 
-    const dayEl = document.createElement('div')
-    dayEl.className = 'day'
-    const parsedDate = new Date(dateKey)
-    dayEl.textContent = Number.isNaN(parsedDate.getTime()) ? dateKey : formatMonthDay(parsedDate)
+  const weeks = new Map<string, { monday: Date; items: Map<number, { key: string; record: NightRecord }> }>()
 
-    const status = document.createElement('div')
-    status.className = 'status'
-    const symbol = record.review?.rating ?? '△'
-    status.textContent = symbol
-    if (symbol === '◎' || symbol === '○') {
-      status.classList.add('good')
-    } else if (symbol === '△') {
-      status.classList.add('ok')
-    } else {
-      status.classList.add('bad')
+  entryList.forEach((item) => {
+    const monday = getMonday(item.date)
+    const weekKey = formatDate(monday)
+    if (!weeks.has(weekKey)) {
+      weeks.set(weekKey, { monday, items: new Map() })
     }
+    const normalizedWeekday = ((item.date.getDay() + 6) % 7)
+    weeks.get(weekKey)!.items.set(normalizedWeekday, { key: item.key, record: item.record })
+  })
 
-    const mood = document.createElement('div')
-    mood.className = 'status-mood'
-    mood.textContent = moodLevel ? '★'.repeat(moodLevel) + '☆'.repeat(5 - moodLevel) : '-----'
+  const sortedWeeks = Array.from(weeks.values()).sort((a, b) => a.monday.getTime() - b.monday.getTime())
 
-    cell.append(dayEl, status, mood)
-    cell.addEventListener('click', () => openModal(dateKey))
-    calendarGrid.appendChild(cell)
+  if (sortedWeeks.length === 0) {
+    const fallbackWeek = { monday: getMonday(state.todayDate), items: new Map<number, { key: string; record: NightRecord }>() }
+    sortedWeeks.push(fallbackWeek)
+  }
+
+  sortedWeeks.forEach((week) => {
+    for (let weekday = 0; weekday < 7; weekday += 1) {
+      const cellDate = new Date(week.monday)
+      cellDate.setDate(cellDate.getDate() + weekday)
+      const entry = week.items.get(weekday)
+      const cell = document.createElement('div')
+      cell.className = 'calendar-cell'
+
+      const dayEl = document.createElement('div')
+      dayEl.className = 'day'
+      dayEl.textContent = formatMonthDay(cellDate)
+
+      const status = document.createElement('div')
+      status.className = 'status'
+      const mood = document.createElement('div')
+      mood.className = 'status-mood'
+
+      if (entry) {
+        const { record, key } = entry
+        const moodLevel = record.review?.mood ?? 0
+        cell.dataset.state = record.review ? 'recorded' : 'blank'
+        cell.dataset.mood = moodLevel ? `m${moodLevel}` : 'none'
+        const symbol = record.review?.rating ?? '△'
+        status.textContent = symbol
+        if (symbol === '◎' || symbol === '○') {
+          status.classList.add('good')
+        } else if (symbol === '△') {
+          status.classList.add('ok')
+        } else {
+          status.classList.add('bad')
+        }
+        mood.textContent = moodLevel ? '★'.repeat(moodLevel) + '☆'.repeat(5 - moodLevel) : '-----'
+        cell.addEventListener('click', () => openModal(key))
+      } else {
+        cell.dataset.state = 'empty'
+        cell.dataset.mood = 'none'
+        status.textContent = '—'
+        mood.textContent = ''
+      }
+
+      cell.append(dayEl, status, mood)
+      calendarGrid.appendChild(cell)
+    }
   })
 }
 
@@ -788,11 +856,15 @@ function switchTab(tab: 'today' | 'calendar' | 'setting') {
   })
 
   currentTab = tab
-  const isToday = tab === 'today'
-  heroCard.classList.toggle('hidden', !isToday)
-  updateShellTheme(getTodayStage())
-  if (isToday) {
-    updateTodayUI()
+  if (tab === 'today') {
+    if (currentTodayView === 'plan') {
+      plannerCard.classList.remove('hidden')
+      reviewCard.classList.add('hidden')
+    } else {
+      plannerCard.classList.add('hidden')
+      reviewCard.classList.remove('hidden')
+    }
+    refreshTodayView()
   }
   updateHeaderForTab(tab)
 }
@@ -817,7 +889,7 @@ function selectDateForEditing(dateKey: string, target: 'plan' | 'review') {
     reviewCard.classList.remove('hidden')
     window.setTimeout(() => reviewText.focus(), 50)
   }
-  updateTodayUI()
+  refreshTodayView()
 }
 
 async function deleteNightRecord(dateKey: string) {
@@ -836,7 +908,7 @@ async function deleteNightRecord(dateKey: string) {
     loadSelectedDate(state.todayDate)
     renderPlanner()
     renderReview()
-    updateTodayUI()
+    refreshTodayView()
   }
   renderCalendar()
 }
@@ -858,6 +930,10 @@ function bindTodayActions() {
   qs<HTMLButtonElement>('#chip-add').addEventListener('click', () => {
     const value = chipInput.value.trim()
     if (!value) return
+    if (state.todayPlan.customChips.includes(value) || state.todayPlan.chips.includes(value)) {
+      window.alert('同じ候補がすでに登録されています')
+      return
+    }
     state.todayPlan.customChips.push(value)
     chipInput.value = ''
     renderPlanner()
@@ -884,7 +960,7 @@ function bindTodayActions() {
       console.error('計画の保存に失敗しました', error)
       window.alert('計画の保存に失敗しました')
     }
-    updateTodayUI()
+    refreshTodayView()
     renderCalendar()
   })
 
@@ -900,14 +976,6 @@ function bindTodayActions() {
     plannerCard.classList.remove('hidden')
     currentTodayView = 'plan'
     renderPlanner()
-  })
-
-  planSummaryEdit.addEventListener('click', () => {
-    plannerCard.classList.remove('hidden')
-    reviewCard.classList.add('hidden')
-    currentTodayView = 'plan'
-    renderPlanner()
-    window.setTimeout(() => plannerText.focus(), 50)
   })
 
   qs<HTMLButtonElement>('#review-save').addEventListener('click', async () => {
@@ -996,6 +1064,12 @@ function bindSettingsForm() {
     const reviewTime = settingReviewTime.value || state.reviewPromptTime
     const motivationTime = settingMotivationTime.value || state.motivationReminder.time
     const avoidanceGoals = goals.length > 0 ? goals : state.avoidanceGoals
+    const rawGratitudeLines = settingGratitude.value.replace(/\r\n/g, '\n').split('\n')
+    if (rawGratitudeLines.length > 60) {
+      settingsMessage.textContent = 'ありがたい言葉は最大60行まで入力できます'
+      return
+    }
+    const gratitudeMessages = rawGratitudeLines.map((line) => line.trim()).filter((line) => line.length > 0)
 
     const updatedSettings: UserSettings = {
       displayName: name,
@@ -1011,6 +1085,7 @@ function bindSettingsForm() {
         time: motivationTime,
         enabled: state.motivationReminder.enabled,
       },
+      gratitudeMessages,
       passcodeEnabled: settingPasscode.checked,
     }
 
@@ -1020,6 +1095,7 @@ function bindSettingsForm() {
       renderReview()
       updateHeaderForTab(currentTab)
       populateSettingsForm()
+      refreshGratitudeMessage()
       settingsMessage.textContent = '保存中...'
       await saveUserSettings(updatedSettings)
       settingsMessage.textContent = '保存しました'
@@ -1181,7 +1257,7 @@ async function hydrateNightLogs() {
     renderPlanner()
     renderReview()
     renderCalendar()
-    updateTodayUI()
+    refreshTodayView()
   } catch (error) {
     console.error('Firestoreからのログ取得に失敗しました', error)
   }
@@ -1192,6 +1268,7 @@ async function hydrateUserSettings() {
     const partial = await fetchUserSettings()
     const merged = mergeUserSettings(partial)
     applySettings(merged)
+    refreshGratitudeMessage()
     renderPlanner()
     renderReview()
     populateSettingsForm()
@@ -1229,7 +1306,7 @@ function bindModal() {
 }
 
 function init() {
-  renderAchievements()
+  refreshGratitudeMessage({ showOpening: true })
   renderPlanner()
   renderReview()
   renderCalendar()
@@ -1238,6 +1315,7 @@ function init() {
   bindSettingsForm()
   bindModal()
   switchTab('today')
+  refreshTodayView()
   pushRequestButton.addEventListener('click', () => {
     void handlePushRegistration()
   })
@@ -1247,6 +1325,7 @@ function init() {
   void setupPushMessaging()
   void hydrateUserSettings()
   void hydrateNightLogs()
+  window.setInterval(updateDateTimeDisplay, 60000)
 }
 
 init()

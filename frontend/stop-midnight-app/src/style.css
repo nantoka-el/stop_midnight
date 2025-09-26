@@ -45,6 +45,7 @@ body {
   min-height: 100vh;
   background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   color: var(--text);
+  touch-action: manipulation;
 }
 
 #app {
@@ -61,7 +62,10 @@ body {
 }
 
 .app-header {
-  padding: 24px 20px 8px;
+  padding: 24px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .app-header h1 {
@@ -70,90 +74,82 @@ body {
   font-weight: 700;
 }
 
-.app-header__sub {
-  margin: 6px 0 0;
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   color: var(--text-muted);
   font-size: 0.95rem;
 }
 
-.hero {
-  margin-top: 16px;
-  padding: 18px;
-  border-radius: 18px;
+.header-time {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.gratitude-message {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.92);
+  line-height: 1.65;
+}
+
+.app-overlay {
+  position: fixed;
+  inset: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  background: var(--state-plan-bg);
-  border: 1px solid rgba(129, 140, 248, 0.35);
-  box-shadow: 0 12px 28px rgba(8, 13, 40, 0.35);
-  transition: background 0.3s ease, border 0.3s ease;
+  justify-content: center;
+  background: radial-gradient(circle at top, rgba(99, 102, 241, 0.35), transparent 60%),
+    linear-gradient(135deg, rgba(99, 102, 241, 0.85), rgba(37, 99, 235, 0.65));
+  z-index: 2000;
 }
 
-.hero[data-state='review'] {
-  background: var(--state-review-bg);
-  border-color: rgba(249, 115, 22, 0.4);
+.app-overlay.hidden {
+  display: none !important;
 }
 
-.hero__streak {
+.opening-content {
+  max-width: 80%;
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  color: #f8fafc;
+  letter-spacing: 0.04em;
+}
+
+.opening-content span {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+.today-header {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.hero__label {
-  font-size: 0.85rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+.today-header__datetime {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
-.hero__count {
-  font-size: 2.6rem;
+.today-header__streak {
+  font-size: 1.4rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  text-align: center;
+  color: rgba(248, 250, 252, 0.9);
 }
 
-.hero__unit {
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
-
-.hero__next {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.hero__state {
+.today-footer {
+  margin-top: 24px;
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  align-items: center;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.45);
-  border: 1px solid rgba(248, 250, 252, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(248, 250, 252, 0.06);
-}
-
-.hero__state[data-state='review'],
-.hero[data-state='review'] .hero__state {
-  background: rgba(249, 115, 22, 0.15);
-  border-color: rgba(249, 115, 22, 0.4);
-}
-
-.hero__state-icon {
-  font-size: 1.6rem;
-}
-
-.hero__state-label {
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-.hero__state-desc {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--text-muted);
 }
 
 .achievement-strip {
@@ -244,23 +240,6 @@ body {
   display: none !important;
 }
 
-.prompt {
-  margin-bottom: 12px;
-  padding: 14px 18px;
-  border-radius: 16px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  background: rgba(129, 140, 248, 0.18);
-  border: 1px solid rgba(129, 140, 248, 0.35);
-  box-shadow: 0 8px 18px rgba(8, 13, 40, 0.25);
-  transition: background 0.3s ease, border 0.3s ease;
-}
-
-.prompt[data-type='review'] {
-  background: rgba(249, 115, 22, 0.18);
-  border-color: rgba(249, 115, 22, 0.4);
-}
-
 .today-card {
   background: var(--surface);
   border-radius: 18px;
@@ -269,16 +248,6 @@ body {
   backdrop-filter: blur(18px);
   border: 1px solid rgba(129, 140, 248, 0.25);
   transition: border 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-:root[data-today-state='plan'] #planner-card {
-  border-color: rgba(129, 140, 248, 0.45);
-  box-shadow: 0 24px 46px rgba(99, 102, 241, 0.25);
-}
-
-:root[data-today-state='review'] #review-card {
-  border-color: rgba(249, 115, 22, 0.45);
-  box-shadow: 0 24px 46px rgba(249, 115, 22, 0.22);
 }
 
 .today-meta {
@@ -299,70 +268,6 @@ body {
   background: rgba(99, 102, 241, 0.2);
   border-radius: 999px;
   font-size: 0.8rem;
-}
-
-.recommended {
-  margin: 18px 0;
-  padding: 18px;
-  border-radius: 16px;
-  background: rgba(129, 140, 248, 0.12);
-  border: 1px solid rgba(129, 140, 248, 0.35);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow: hidden;
-  position: relative;
-  animation: recommend-pop 0.4s ease;
-}
-
-.recommended[data-state='review'] {
-  opacity: 0.4;
-}
-
-.recommended::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top right, rgba(129, 140, 248, 0.25), transparent 55%);
-  pointer-events: none;
-}
-
-.recommended__header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.recommended__icon {
-  font-size: 1.2rem;
-}
-
-.recommended__title {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-}
-
-.recommended__body {
-  font-size: 0.95rem;
-  color: var(--text);
-  line-height: 1.5;
-}
-
-@keyframes recommend-pop {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.recommended span {
-  font-size: 0.9rem;
 }
 
 .field {
@@ -386,6 +291,11 @@ input[type='time'] {
   color: inherit;
   font-size: 1rem;
   resize: vertical;
+}
+
+#setting-gratitude {
+  min-height: 11.5em;
+  white-space: pre-wrap;
 }
 
 textarea:focus,
@@ -436,6 +346,27 @@ input[type='time']:focus {
 
 .chip:hover {
   background: rgba(129, 140, 248, 0.18);
+}
+
+.chip[data-custom='true'] {
+  position: relative;
+}
+
+.chip[data-custom='true']::after {
+  content: '長押しで削除';
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.chip[data-custom='true']:active::after {
+  opacity: 1;
 }
 
 .toggle {
@@ -583,6 +514,22 @@ button {
   margin-bottom: 60px;
 }
 
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(40px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.calendar-weekdays span:nth-child(6),
+.calendar-weekdays span:nth-child(7) {
+  color: rgba(248, 113, 113, 0.8);
+}
+
 .calendar-cell {
   background: rgba(15, 23, 42, 0.7);
   padding: 12px 8px;
@@ -599,6 +546,17 @@ button {
 
 .calendar-cell[data-state='blank'] {
   opacity: 0.6;
+}
+
+.calendar-cell[data-state='empty'] {
+  opacity: 0.4;
+  background: rgba(15, 23, 42, 0.25);
+  border-style: dashed;
+}
+
+.calendar-cell[data-state='empty'] .status,
+.calendar-cell[data-state='empty'] .status-mood {
+  opacity: 0.35;
 }
 
 .calendar-cell[data-mood='m1'] {
@@ -822,9 +780,6 @@ button {
     background: linear-gradient(175deg, #e2e8f0 0%, #cbd5f5 100%);
     color: var(--text);
   }
-  .prompt {
-    background: rgba(99, 102, 241, 0.2);
-  }
   .chip {
     background: rgba(99, 102, 241, 0.08);
   }
@@ -833,115 +788,6 @@ button {
   }
 }
 
-
-.today-steps {
-  display: flex;
-  gap: 10px;
-  margin: 0 0 12px;
-}
-
-.today-step {
-  flex: 1;
-  border-radius: 14px;
-  padding: 10px 12px;
-  background: rgba(248, 250, 252, 0.06);
-  border: 1px solid rgba(129, 140, 248, 0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
-  transition: background 0.2s ease, border 0.2s ease;
-}
-
-.today-step__number {
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.today-step__label {
-  font-weight: 600;
-}
-
-.today-step.is-current {
-  border-color: rgba(129, 140, 248, 0.7);
-  background: rgba(129, 140, 248, 0.2);
-  color: var(--text);
-}
-
-.today-step.is-complete {
-  background: rgba(34, 197, 94, 0.18);
-  border-color: rgba(34, 197, 94, 0.6);
-}
-
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: rgba(248, 250, 252, 0.08);
-  border: 1px solid rgba(248, 250, 252, 0.12);
-  margin-bottom: 12px;
-}
-
-.status-pill.status-plan {
-  background: rgba(248, 250, 252, 0.12);
-}
-
-.status-pill.status-review {
-  background: rgba(129, 140, 248, 0.24);
-}
-
-.status-pill.status-done {
-  background: rgba(34, 197, 94, 0.24);
-}
-
-.plan-summary {
-  background: rgba(248, 250, 252, 0.05);
-  border: 1px solid rgba(129, 140, 248, 0.25);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 14px;
-}
-
-.plan-summary__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.plan-summary__title {
-  font-size: 0.95rem;
-}
-
-.plan-summary p {
-  margin: 0;
-  white-space: pre-wrap;
-  font-size: 0.9rem;
-}
-
-.ghost.small {
-  padding: 8px 12px;
-  font-size: 0.8rem;
-}
-
-.modal-meta {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 8px;
-}
-
-
-.prompt[data-type="review"] {
-  background: rgba(248, 250, 252, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.4);
-  color: rgba(248, 250, 252, 0.95);
-}
 
 .modal-actions {
   display: flex;
