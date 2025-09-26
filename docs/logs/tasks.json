@@ -336,8 +336,8 @@
       "33"
     ],
     "title": "レポジトリDeepDive（nakayama 2025 Autumn）",
-    "status": "todo",
-    "filename": "0033_repository_deepdive_nakayama_todo.md"
+    "status": "done",
+    "filename": "0033_repository_deepdive_nakayama_done.md"
   },
   {
     "id": "0034",
@@ -358,5 +358,15 @@
     "title": "TODAY画面UXリニューアル実装",
     "status": "done",
     "filename": "0035_today_ui_overhaul_impl_done.md"
+  },
+  {
+    "id": "0036",
+    "idRaw": "36",
+    "aliases": [
+      "36"
+    ],
+    "title": "オープニング演出・パスコード導入・UI調整",
+    "status": "todo",
+    "filename": "0036_opening_passcode_refresh_todo.md"
   }
 ]

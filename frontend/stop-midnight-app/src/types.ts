@@ -83,5 +83,6 @@ export type AppState = {
   achievements: Achievement[]
   gratitudeMessages: string[]
   currentGratitude: string
+  currentGratitudeIndex: number
   records: Record<string, NightRecord>
 }

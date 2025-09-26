@@ -14,7 +14,7 @@ const PLAN_PLACEHOLDERS = [
   '軽いヨガと深呼吸で体をリセットする',
 ]
 
-const DEFAULT_GRATITUDE_MESSAGES = [
+const DEFAULT_ARIGATEE_MESSAGES = [
   '夜が楽しくても、明日の自分が困らないようにね。',
   '欲望に引っ張られそうになったら、ゆっくり深呼吸。',
   '眠る前の30分だけ、未来の自分のために使ってみよう。',
@@ -31,7 +31,7 @@ const defaultSettings: UserSettings = {
   plannerPromptTimeslot: { start: '22:00', end: '23:00', randomize: true },
   reviewPromptTime: '04:00',
   motivationReminder: { time: '21:00', enabled: true },
-  gratitudeMessages: [...DEFAULT_GRATITUDE_MESSAGES],
+  gratitudeMessages: [...DEFAULT_ARIGATEE_MESSAGES],
   passcodeEnabled: false,
 }
 
@@ -57,8 +57,9 @@ const state: AppState = {
     { id: 'habit-avoid-10', title: '誘惑バスター', description: '夜の誘惑を10回回避しよう', icon: '🛡️', unlocked: false, progress: 6, goal: 10, category: 'habit' },
     { id: 'recovery-1', title: 'リカバリー成功', description: '連続達成が途切れた翌日に立て直す', icon: '🔄', unlocked: false, progress: 0, goal: 1, category: 'recovery' },
   ],
-  gratitudeMessages: [...DEFAULT_GRATITUDE_MESSAGES],
-  currentGratitude: DEFAULT_GRATITUDE_MESSAGES[0],
+  gratitudeMessages: [...DEFAULT_ARIGATEE_MESSAGES],
+  currentGratitude: DEFAULT_ARIGATEE_MESSAGES[0],
+  currentGratitudeIndex: 0,
   records: initialRecords,
 }
 
@@ -158,6 +159,7 @@ function formatFullDateTime(date: Date, reference: Date): string {
 
 let openingTypingTimer: number | undefined
 let openingHideTimer: number | undefined
+let gratitudeAnimation: Animation | null = null
 
 function updateDateTimeDisplay() {
   const now = new Date()
@@ -168,19 +170,71 @@ function updateDateTimeDisplay() {
   }
 }
 
-function chooseGratitudeMessage(): string {
-  const pool = state.gratitudeMessages.length > 0 ? state.gratitudeMessages : DEFAULT_GRATITUDE_MESSAGES
-  return pool[Math.floor(Math.random() * pool.length)] ?? DEFAULT_GRATITUDE_MESSAGES[0]
+function getArigateWordPool(): string[] {
+  const pool = state.gratitudeMessages.length > 0 ? state.gratitudeMessages : DEFAULT_ARIGATEE_MESSAGES
+  return pool.length > 0 ? pool : DEFAULT_ARIGATEE_MESSAGES
 }
 
-function updateGratitudeMessage(message: string) {
+function normalizeGratitudeIndex(index: number, length: number): number {
+  if (length <= 0) return 0
+  return ((index % length) + length) % length
+}
+
+type GratitudeDirection = 'next' | 'prev' | 'random'
+
+function applyGratitudeMessage(index: number, direction: GratitudeDirection = 'random'): string {
+  const pool = getArigateWordPool()
+  const normalizedIndex = normalizeGratitudeIndex(index, pool.length)
+  const message = pool[normalizedIndex] ?? ''
+  state.currentGratitudeIndex = normalizedIndex
   state.currentGratitude = message
   gratitudeMessageEl.textContent = message
+  const translate = direction === 'next' ? -12 : direction === 'prev' ? 12 : 0
+  if (typeof gratitudeMessageEl.animate === 'function') {
+    if (gratitudeAnimation) {
+      gratitudeAnimation.cancel()
+    }
+    gratitudeAnimation = gratitudeMessageEl.animate(
+      [
+        { opacity: 0, transform: `translateX(${translate}px)` },
+        { opacity: 1, transform: 'translateX(0)' },
+      ],
+      { duration: 220, easing: 'ease-out' },
+    )
+    gratitudeAnimation.addEventListener('finish', () => {
+      gratitudeAnimation = null
+    })
+    gratitudeAnimation.addEventListener('cancel', () => {
+      gratitudeAnimation = null
+    })
+  }
+  return message
+}
+
+function pickRandomGratitudeIndex(excludeIndex: number | null): number {
+  const pool = getArigateWordPool()
+  if (pool.length <= 1) return 0
+  let index = Math.floor(Math.random() * pool.length)
+  if (excludeIndex !== null && pool.length > 1) {
+    while (index === excludeIndex) {
+      index = Math.floor(Math.random() * pool.length)
+    }
+  }
+  return index
+}
+
+function createOpeningGradient(): string {
+  const baseHue = Math.floor(Math.random() * 360)
+  const secondaryHue = (baseHue + 25 + Math.floor(Math.random() * 80)) % 360
+  const saturation = 68 + Math.random() * 18
+  const lightnessStart = 24 + Math.random() * 10
+  const lightnessEnd = 18 + Math.random() * 12
+  return `linear-gradient(135deg, hsl(${baseHue} ${saturation}% ${lightnessStart}%), hsl(${secondaryHue} ${Math.min(saturation + 6, 90)}% ${lightnessEnd}%))`
 }
 
 function showOpeningScreen(message: string) {
   hideOpeningScreen()
-  updateGratitudeMessage(message)
+  openingScreen.style.background = createOpeningGradient()
   openingScreen.classList.remove('hidden')
   openingScreen.setAttribute('aria-hidden', 'false')
   openingText.textContent = ''
@@ -190,7 +244,7 @@ function showOpeningScreen(message: string) {
     return
   }
   let index = 0
-  const intervalMs = 250 // 1秒あたり4文字
+  const intervalMs = 84 // 約12文字/秒（従来比3倍）
   openingTypingTimer = window.setInterval(() => {
     openingText.textContent += chars[index]
     index += 1
@@ -215,14 +269,43 @@ function hideOpeningScreen() {
   }
   openingScreen.classList.add('hidden')
   openingScreen.setAttribute('aria-hidden', 'true')
+  openingScreen.style.background = ''
 }
 
-function refreshGratitudeMessage(options: { showOpening?: boolean } = {}) {
-  const message = chooseGratitudeMessage()
+type GratitudeRefreshOptions = {
+  showOpening?: boolean
+  method?: 'random' | 'next' | 'prev'
+  index?: number
+}
+
+function refreshGratitudeMessage(options: GratitudeRefreshOptions = {}) {
+  const pool = getArigateWordPool()
+  if (pool.length === 0) {
+    gratitudeMessageEl.textContent = ''
+    state.currentGratitude = ''
+    state.currentGratitudeIndex = 0
+    return
+  }
+
+  let nextIndex = state.currentGratitudeIndex ?? 0
+  let direction: GratitudeDirection = 'random'
+
+  if (typeof options.index === 'number') {
+    nextIndex = options.index
+  } else if (options.method === 'next') {
+    nextIndex = state.currentGratitudeIndex + 1
+    direction = 'next'
+  } else if (options.method === 'prev') {
+    nextIndex = state.currentGratitudeIndex - 1
+    direction = 'prev'
+  } else if (options.method === 'random' || options.showOpening || state.currentGratitude === '') {
+    nextIndex = pickRandomGratitudeIndex(pool.length > 1 ? state.currentGratitudeIndex : null)
+    direction = 'random'
+  }
+
+  const message = applyGratitudeMessage(nextIndex, direction)
   if (options.showOpening) {
     showOpeningScreen(message)
-  } else {
-    updateGratitudeMessage(message)
   }
 }
 
@@ -241,7 +324,20 @@ function getRecord(dateKey: string, create = false): NightRecord | undefined {
 }
 
 function parseDateKeyToDate(key: string): Date {
-  return new Date(key.replace(/\//g, '-'))
+  const parts = key.split('/')
+  if (parts.length !== 3) {
+    return new Date(Number.NaN)
+  }
+  const [yearStr, monthStr, dayStr] = parts
+  const year = Number.parseInt(yearStr, 10)
+  const month = Number.parseInt(monthStr, 10)
+  const day = Number.parseInt(dayStr, 10)
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+    return new Date(Number.NaN)
+  }
+  const date = new Date(year, month - 1, day)
+  date.setHours(0, 0, 0, 0)
+  return date
 }
 
 function computeCurrentStreak(records: Record<string, NightRecord>): number {
@@ -432,15 +528,15 @@ appRoot.innerHTML = `
           </label>
         </div>
         <label class="field">
-          <span>ありがたい言葉（改行ごとに1つ、最大60行）</span>
+          <span>ありがてえ言葉（改行ごとに1つ、最大60行）</span>
           <textarea id="setting-gratitude" rows="7" placeholder="賢い時の自分から夜の自分へ伝えたい言葉"></textarea>
         </label>
         <label class="toggle">
           <input type="checkbox" id="setting-passcode">
-          <span>パスコードロックを有効にする（モック）</span>
+          <span>パスコードロックを有効にする</span>
         </label>
         <div class="settings-actions">
-          <button type="submit" class="primary">保存（モック）</button>
+          <button type="submit" class="primary">保存</button>
           <button type="button" id="setting-reset" class="ghost">リセット</button>
         </div>
         <div class="settings-message" id="settings-message"></div>
@@ -507,6 +603,7 @@ const todayInfo = qs<HTMLDivElement>('#today-info')
 const todayStreak = qs<HTMLDivElement>('#today-streak')
 const achievementStrip = qs<HTMLDivElement>('#achievement-strip')
 const nextTargetMessage = qs<HTMLDivElement>('#next-target')
+const todayFooter = qs<HTMLDivElement>('#today-footer')
 const reviewNightLabel = qs<HTMLDivElement>('#review-night-label')
 const previousPlanEl = qs<HTMLDivElement>('#previous-plan')
 const reviewMetaInfo = qs<HTMLDivElement>('#review-meta-info')
@@ -575,40 +672,9 @@ function populateSettingsForm() {
 }
 
 function renderAchievements() {
+  todayFooter.classList.add('hidden')
   achievementStrip.innerHTML = ''
-  state.achievements.forEach((achievement) => {
-    const card = document.createElement('div')
-    card.className = 'achievement-card'
-    card.dataset.locked = (!achievement.unlocked).toString()
-    const ratio = Math.min(achievement.progress / achievement.goal, 1)
-    card.innerHTML = `
-      <div class="achievement-card__header">
-        <span class="achievement-card__icon">${achievement.icon}</span>
-        <div class="achievement-card__titles">
-          <strong>${achievement.title}</strong>
-          <small>${achievement.description}</small>
-        </div>
-      </div>
-      <div class="achievement-card__progress">
-        <div class="achievement-card__bar" style="width: ${ratio * 100}%"></div>
-      </div>
-      <div class="achievement-card__footer">${achievement.unlocked ? '獲得済み' : `あと${Math.max(achievement.goal - achievement.progress, 0)}で解除`}</div>
-    `
-    achievementStrip.appendChild(card)
-  })
-  renderNextTargetMessage()
-}
-
-function renderNextTargetMessage() {
-  const pending = state.achievements.filter((ach) => !ach.unlocked)
-  if (pending.length === 0) {
-    nextTargetMessage.textContent = '称号コンプリート！おめでとうございます 🎉'
-    return
-  }
-  const next = pending.reduce((best, curr) => (curr.progress / curr.goal) > (best.progress / best.goal) ? curr : best)
-  const remaining = Math.max(next.goal - next.progress, 0)
-  const percent = Math.min((next.progress / next.goal) * 100, 100).toFixed(0)
-  nextTargetMessage.textContent = `${next.title} まであと ${remaining}。進捗 ${percent}%`
+  nextTargetMessage.textContent = ''
 }
 
 function setPlannerPlaceholder() {
@@ -870,7 +936,7 @@ function switchTab(tab: 'today' | 'calendar' | 'setting') {
 }
 
 function selectDateForEditing(dateKey: string, target: 'plan' | 'review') {
-  const date = new Date(dateKey)
+  const date = parseDateKeyToDate(dateKey)
   if (Number.isNaN(date.getTime())) {
     window.alert('日付の形式が正しくありません')
     return
@@ -919,6 +985,63 @@ function bindTabBar() {
       const tab = button.dataset.tab as 'today' | 'calendar' | 'setting'
       switchTab(tab)
     })
+  })
+}
+
+function bindGratitudeInteractions() {
+  let pointerId: number | null = null
+  let startX = 0
+  let startY = 0
+
+  function resetSwipe() {
+    pointerId = null
+    startX = 0
+    startY = 0
+  }
+
+  gratitudeMessageEl.addEventListener('pointerdown', (event) => {
+    pointerId = event.pointerId
+    startX = event.clientX
+    startY = event.clientY
+    try {
+      gratitudeMessageEl.setPointerCapture(event.pointerId)
+    } catch (error) {
+      // Safariなど一部環境ではPointer Eventsの完全サポートがないため黙って無視
+    }
+  })
+
+  gratitudeMessageEl.addEventListener('pointerup', (event) => {
+    if (pointerId !== event.pointerId) {
+      return
+    }
+    const deltaX = event.clientX - startX
+    const deltaY = event.clientY - startY
+    const absX = Math.abs(deltaX)
+    const absY = Math.abs(deltaY)
+    if (absX > 40 && absX > absY) {
+      if (deltaX < 0) {
+        refreshGratitudeMessage({ method: 'next' })
+      } else {
+        refreshGratitudeMessage({ method: 'prev' })
+      }
+    }
+    try {
+      gratitudeMessageEl.releasePointerCapture(event.pointerId)
+    } catch (error) {
+      // 取得に失敗した場合も特に問題はないので無視
+    }
+    resetSwipe()
+  })
+
+  gratitudeMessageEl.addEventListener('pointercancel', (event) => {
+    if (pointerId === event.pointerId) {
+      try {
+        gratitudeMessageEl.releasePointerCapture(event.pointerId)
+      } catch (error) {
+        // 取得に失敗した場合も特に問題はないので無視
+      }
+    }
+    resetSwipe()
   })
 }
 
@@ -1066,7 +1189,7 @@ function bindSettingsForm() {
     const avoidanceGoals = goals.length > 0 ? goals : state.avoidanceGoals
     const rawGratitudeLines = settingGratitude.value.replace(/\r\n/g, '\n').split('\n')
     if (rawGratitudeLines.length > 60) {
-      settingsMessage.textContent = 'ありがたい言葉は最大60行まで入力できます'
+      settingsMessage.textContent = 'ありがてえ言葉は最大60行まで入力できます'
       return
     }
     const gratitudeMessages = rawGratitudeLines.map((line) => line.trim()).filter((line) => line.length > 0)
@@ -1311,6 +1434,7 @@ function init() {
   renderReview()
   renderCalendar()
   bindTabBar()
+  bindGratitudeInteractions()
   bindTodayActions()
   bindSettingsForm()
   bindModal()
