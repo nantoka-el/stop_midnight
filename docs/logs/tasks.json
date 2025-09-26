@@ -246,16 +246,6 @@
       "24"
     ],
     "title": "リポジトリ全体DeepDive再読",
-    "status": "done",
-    "filename": "0024_repository_deepdive_done.md"
-  },
-  {
-    "id": "0024",
-    "idRaw": "24",
-    "aliases": [
-      "24"
-    ],
-    "title": "リポジトリ全体DeepDive再読",
     "status": "todo",
     "filename": "0024_repository_deepdive_todo.md"
   },
@@ -348,5 +338,15 @@
     "title": "レポジトリDeepDive（nakayama 2025 Autumn）",
     "status": "todo",
     "filename": "0033_repository_deepdive_nakayama_todo.md"
+  },
+  {
+    "id": "0034",
+    "idRaw": "34",
+    "aliases": [
+      "34"
+    ],
+    "title": "TODAY画面UX見直し仕様策定",
+    "status": "todo",
+    "filename": "0034_today_ui_overhaul_spec_todo.md"
   }
 ]
