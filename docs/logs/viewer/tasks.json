@@ -318,5 +318,15 @@
     "title": "マルチユーザー対応の設計検討",
     "status": "todo",
     "filename": "0031_multi_user_design_todo.md"
+  },
+  {
+    "id": "0032",
+    "idRaw": "32",
+    "aliases": [
+      "32"
+    ],
+    "title": "ユーザー設定のFirestore同期",
+    "status": "todo",
+    "filename": "0032_user_settings_sync_todo.md"
   }
 ]

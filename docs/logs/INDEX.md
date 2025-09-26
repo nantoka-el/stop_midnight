@@ -1,18 +1,18 @@
 # Logs INDEX
-*自動生成: 2025/9/26 20:46:23*
+*自動生成: 2025/9/26 20:52:28*
 
 ## 📊 サマリー
 - BACKLOG: 1件
-- TODO: 10件
+- TODO: 11件
 - REVIEW: 5件
 - DONE: 16件
-- 合計: 32件
+- 合計: 33件
 
 ## 📑 BACKLOG (1)
 
 - **0004: プライバシー保護機能の検討** - [0004_privacy_guard_backlog.md](./tasks/0004_privacy_guard_backlog.md)
 
-## 📝 TODO (10)
+## 📝 TODO (11)
 
 - **0002: 目標設定フローの仕様整理** - [0002_goal_setting_spec_todo.md](./tasks/0002_goal_setting_spec_todo.md)
 - **0005: FCM通知基盤の設計** - [0005_fcm_notification_plan_todo.md](./tasks/0005_fcm_notification_plan_todo.md)
@@ -24,6 +24,7 @@
 - **0029: プッシュ通知検証とApple Developer準備** - [0029_push_validation_plan_todo.md](./tasks/0029_push_validation_plan_todo.md)
 - **0030: UI再調整と演出ブラッシュアップ** - [0030_ui_polish_secondpass_todo.md](./tasks/0030_ui_polish_secondpass_todo.md)
 - **0031: マルチユーザー対応の設計検討** - [0031_multi_user_design_todo.md](./tasks/0031_multi_user_design_todo.md)
+- **0032: ユーザー設定のFirestore同期** - [0032_user_settings_sync_todo.md](./tasks/0032_user_settings_sync_todo.md)
 
 ## 🔍 REVIEW (5)
 
