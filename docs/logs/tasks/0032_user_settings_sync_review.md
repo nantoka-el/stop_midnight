@@ -4,7 +4,7 @@ Author: nakayama
 Edited-By: nakayama 2025-09-26
 
 - 概要: displayName や避けたいことなど設定タブで更新する情報を Firestore に保存・読み込みできるようにする
-- 状態: TODO（ファイル名末尾が唯一の真実）
+- 状態: REVIEW（ファイル名末尾が唯一の真実）
 - 受け入れ基準:
   - `userSettings/{uid}` ドキュメントを定義し、表示名・目標・通知設定などを保存できる
   - アプリ起動時に設定を取得して state に反映し、端末間で同期される
@@ -17,4 +17,5 @@ Edited-By: nakayama 2025-09-26
 
 ---
 Change Log
+- 2025-09-26 nakayama: Firestore同期実装を反映しレビュー待ち
 - 2025-09-26 nakayama: 作成

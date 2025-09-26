@@ -326,7 +326,7 @@
       "32"
     ],
     "title": "ユーザー設定のFirestore同期",
-    "status": "todo",
-    "filename": "0032_user_settings_sync_todo.md"
+    "status": "review",
+    "filename": "0032_user_settings_sync_review.md"
   }
 ]
