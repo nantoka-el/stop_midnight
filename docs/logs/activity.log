@@ -122,3 +122,12 @@
 {"ts":"2025-09-26T18:30:53.234Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0036_opening_passcode_refresh_todo.md"}
 {"ts":"2025-09-26T18:35:47.572Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0036_opening_passcode_refresh_todo.md"}
 {"ts":"2025-09-26T18:48:56.221Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0036_opening_passcode_refresh_todo.md"}
+{"ts":"2025-09-26T19:06:58.202Z","type":"status","author":"kirara","filename":"0006_firebase_cli_setup_done.md","prevFilename":"0006_firebase_cli_setup_review.md","from":"review","to":"done"}
+{"ts":"2025-09-26T19:06:58.991Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0006_firebase_cli_setup_review.md"}
+{"ts":"2025-09-26T19:07:00.450Z","type":"status","author":"kirara","filename":"0014_frontend_impl_done.md","prevFilename":"0014_frontend_impl_review.md","from":"review","to":"done"}
+{"ts":"2025-09-26T19:07:01.242Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0014_frontend_impl_review.md"}
+{"ts":"2025-09-26T19:07:03.718Z","type":"status","author":"kirara","filename":"0021_gamification_deepdive_done.md","prevFilename":"0021_gamification_deepdive_review.md","from":"review","to":"done"}
+{"ts":"2025-09-26T19:07:04.506Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0021_gamification_deepdive_review.md"}
+{"ts":"2025-09-26T19:07:05.619Z","type":"status","author":"kirara","filename":"0022_tabbar_ui_fix_done.md","prevFilename":"0022_tabbar_ui_fix_review.md","from":"review","to":"done"}
+{"ts":"2025-09-26T19:07:06.408Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0022_tabbar_ui_fix_review.md"}
+{"ts":"2025-09-26T19:52:37.526Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0024_repository_deepdive_todo.md"}

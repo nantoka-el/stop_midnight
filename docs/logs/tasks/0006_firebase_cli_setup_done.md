@@ -1,7 +1,7 @@
 # 0006: Firebase CLI セットアップと初期設定
 
 Author: kirara
-Edited-By: kirara 2025-09-25
+Edited-By: kirara 2025-09-26
 
 - 概要: Firebase CLI を用いて stop_midnight 用のプロジェクト設定を行い、通知基盤の準備を整える
 - 状態: REVIEW（ファイル名末尾が唯一の真実）
@@ -26,3 +26,5 @@ Change Log
 - 2025-09-25 kirara: 作成
 
 - 2025-09-25 kirara: ステータス todo → review
+
+- 2025-09-26 kirara: ステータス review → done

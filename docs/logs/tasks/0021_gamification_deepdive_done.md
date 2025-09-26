@@ -1,7 +1,7 @@
 # 0021: ゲーミフィケーション要素の再設計
 
 Author: kirara
-Edited-By: kirara 2025-09-25
+Edited-By: kirara 2025-09-26
 
 - 概要: 連続達成以外の称号や進捗表示など、モチベーションを高める仕掛けを整理しUIへ反映する
 - 状態: REVIEW（ファイル名末尾が唯一の真実）
@@ -19,3 +19,5 @@ Change Log
 - 2025-09-25 kirara: 実装を反映
 - 2025-09-25 kirara: 作成
 - 2025-09-25 kirara: ステータス todo → review
+
+- 2025-09-26 kirara: ステータス review → done

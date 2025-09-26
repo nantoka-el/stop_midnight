@@ -56,8 +56,8 @@
       "6"
     ],
     "title": "Firebase CLI セットアップと初期設定",
-    "status": "review",
-    "filename": "0006_firebase_cli_setup_review.md"
+    "status": "done",
+    "filename": "0006_firebase_cli_setup_done.md"
   },
   {
     "id": "0007",
@@ -136,8 +136,8 @@
       "14"
     ],
     "title": "Vite + TypeScriptによるフロントエンド実装",
-    "status": "review",
-    "filename": "0014_frontend_impl_review.md"
+    "status": "done",
+    "filename": "0014_frontend_impl_done.md"
   },
   {
     "id": "0015",
@@ -206,8 +206,8 @@
       "21"
     ],
     "title": "ゲーミフィケーション要素の再設計",
-    "status": "review",
-    "filename": "0021_gamification_deepdive_review.md"
+    "status": "done",
+    "filename": "0021_gamification_deepdive_done.md"
   },
   {
     "id": "0021",
@@ -226,8 +226,8 @@
       "22"
     ],
     "title": "タブバーのアクティブ表示改善",
-    "status": "review",
-    "filename": "0022_tabbar_ui_fix_review.md"
+    "status": "done",
+    "filename": "0022_tabbar_ui_fix_done.md"
   },
   {
     "id": "0023",

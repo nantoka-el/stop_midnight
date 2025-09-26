@@ -1,11 +1,11 @@
 # Logs INDEX
-*自動生成: 2025/9/27 3:48:56*
+*自動生成: 2025/9/27 4:52:44*
 
 ## 📊 サマリー
 - BACKLOG: 1件
 - TODO: 10件
-- REVIEW: 6件
-- DONE: 20件
+- REVIEW: 2件
+- DONE: 24件
 - 合計: 37件
 
 ## 📑 BACKLOG (1)
@@ -25,19 +25,16 @@
 - **0031: マルチユーザー対応の設計検討** - [0031_multi_user_design_todo.md](./tasks/0031_multi_user_design_todo.md)
 - **0036: オープニング演出・パスコード導入・UI調整** - [0036_opening_passcode_refresh_todo.md](./tasks/0036_opening_passcode_refresh_todo.md)
 
-## 🔍 REVIEW (6)
+## 🔍 REVIEW (2)
 
-- **0006: Firebase CLI セットアップと初期設定** - [0006_firebase_cli_setup_review.md](./tasks/0006_firebase_cli_setup_review.md)
-- **0014: Vite + TypeScriptによるフロントエンド実装** - [0014_frontend_impl_review.md](./tasks/0014_frontend_impl_review.md)
-- **0021: ゲーミフィケーション要素の再設計** - [0021_gamification_deepdive_review.md](./tasks/0021_gamification_deepdive_review.md)
-- **0022: タブバーのアクティブ表示改善** - [0022_tabbar_ui_fix_review.md](./tasks/0022_tabbar_ui_fix_review.md)
 - **0026: FCMプッシュ通知の一気通貫実装** - [0026_fcm_end_to_end_review.md](./tasks/0026_fcm_end_to_end_review.md)
 - **0032: ユーザー設定のFirestore同期** - [0032_user_settings_sync_review.md](./tasks/0032_user_settings_sync_review.md)
 
-## ✅ DONE (20)
+## ✅ DONE (24)
 
 - **0001: Stop Midnight Task Viewer 導入** - [0001_task_viewer_setup_done.md](./tasks/0001_task_viewer_setup_done.md)
 - **0003: コア体験の詳細設計ブレスト** - [0003_core_flow_brainstorm_done.md](./tasks/0003_core_flow_brainstorm_done.md)
+- **0006: Firebase CLI セットアップと初期設定** - [0006_firebase_cli_setup_done.md](./tasks/0006_firebase_cli_setup_done.md)
 - **0007: Firebase Functions/Firestore 初期ファイルの作成** - [0007_functions_scaffold_done.md](./tasks/0007_functions_scaffold_done.md)
 - **0008: Gitリポジトリ初期化と基本設定** - [0008_git_repo_setup_done.md](./tasks/0008_git_repo_setup_done.md)
 - **0009: TODAYタブのモック実装** - [0009_today_tab_mock_done.md](./tasks/0009_today_tab_mock_done.md)
@@ -45,11 +42,14 @@
 - **0011: Settingタブのモック実装** - [0011_setting_tab_mock_done.md](./tasks/0011_setting_tab_mock_done.md)
 - **0012: TODAYタブの追加改善** - [0012_today_enhancements_done.md](./tasks/0012_today_enhancements_done.md)
 - **0013: Calendarタブの追加改善** - [0013_calendar_enhancements_done.md](./tasks/0013_calendar_enhancements_done.md)
+- **0014: Vite + TypeScriptによるフロントエンド実装** - [0014_frontend_impl_done.md](./tasks/0014_frontend_impl_done.md)
 - **0016: Nodeバージョン設定** - [0016_node_version_setup_done.md](./tasks/0016_node_version_setup_done.md)
 - **0017: Calendar/Review UI強化** - [0017_calendar_review_enhancements_done.md](./tasks/0017_calendar_review_enhancements_done.md)
 - **0019: TODAYタブの状態可視化とプラン確認** - [0019_today_state_flow_done.md](./tasks/0019_today_state_flow_done.md)
 - **0020: Calendarモーダルからの編集・削除フロー** - [0020_calendar_edit_flow_done.md](./tasks/0020_calendar_edit_flow_done.md)
+- **0021: ゲーミフィケーション要素の再設計** - [0021_gamification_deepdive_done.md](./tasks/0021_gamification_deepdive_done.md)
 - **0021: リポジトリ全体DeepDive理解** - [0021_repository_deepdive_done.md](./tasks/0021_repository_deepdive_done.md)
+- **0022: タブバーのアクティブ表示改善** - [0022_tabbar_ui_fix_done.md](./tasks/0022_tabbar_ui_fix_done.md)
 - **0023: Calendarセルへの気分表示追加** - [0023_calendar_mood_indicator_done.md](./tasks/0023_calendar_mood_indicator_done.md)
 - **0027: Firestore連携による夜ログ保存** - [0027_firestore_integration_done.md](./tasks/0027_firestore_integration_done.md)
 - **0028: PWAアイコンとmanifest整備** - [0028_pwa_assets_setup_done.md](./tasks/0028_pwa_assets_setup_done.md)

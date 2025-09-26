@@ -1,7 +1,7 @@
 # 0014: Vite + TypeScriptによるフロントエンド実装
 
 Author: kirara
-Edited-By: kirara 2025-09-25
+Edited-By: kirara 2025-09-26
 
 - 概要: GitHub Pagesで動作するPWAフロント（TODAY/Calendar/Setting）をVite+TypeScriptで実装し直す
 - 状態: REVIEW（ファイル名末尾が唯一の真実）
@@ -19,3 +19,5 @@ Change Log
 - 2025-09-25 kirara: Viteプロジェクトを生成
 - 2025-09-25 kirara: 作成
 - 2025-09-25 kirara: ステータス todo → review
+
+- 2025-09-26 kirara: ステータス review → done
