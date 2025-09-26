@@ -1386,18 +1386,21 @@ async function hydrateNightLogs() {
   }
 }
 
-async function hydrateUserSettings() {
+async function hydrateUserSettings(options: { showOpening?: boolean } = {}) {
   try {
     const partial = await fetchUserSettings()
     const merged = mergeUserSettings(partial)
     applySettings(merged)
-    refreshGratitudeMessage()
+    refreshGratitudeMessage({ method: 'random', showOpening: options.showOpening })
     renderPlanner()
     renderReview()
     populateSettingsForm()
     updateHeaderForTab(currentTab)
   } catch (error) {
     console.error('ユーザー設定の取得に失敗しました', error)
+    if (options.showOpening) {
+      refreshGratitudeMessage({ showOpening: true })
+    }
   }
 }
 
@@ -1429,7 +1432,7 @@ function bindModal() {
 }
 
 function init() {
-  refreshGratitudeMessage({ showOpening: true })
+  refreshGratitudeMessage({ method: 'random' })
   renderPlanner()
   renderReview()
   renderCalendar()
@@ -1447,7 +1450,7 @@ function init() {
     void sendTestNotification()
   })
   void setupPushMessaging()
-  void hydrateUserSettings()
+  void hydrateUserSettings({ showOpening: true })
   void hydrateNightLogs()
   window.setInterval(updateDateTimeDisplay, 60000)
 }
