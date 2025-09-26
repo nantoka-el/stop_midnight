@@ -941,11 +941,11 @@ function selectDateForEditing(dateKey: string, target: 'plan' | 'review') {
     window.alert('日付の形式が正しくありません')
     return
   }
+  currentTodayView = target
   loadSelectedDate(date)
   renderPlanner()
   renderReview()
   switchTab('today')
-  currentTodayView = target
   if (target === 'plan') {
     plannerCard.classList.remove('hidden')
     reviewCard.classList.add('hidden')
