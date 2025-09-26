@@ -606,17 +606,33 @@ button {
 }
 
 .status-mood {
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   color: var(--text-muted);
 }
 
-.calendar-cell[data-mood^='m'] .status-mood {
-  color: rgba(15, 23, 42, 0.8);
-  font-weight: 600;
+.status-mood__icon,
+.status-mood__placeholder {
+  font-size: 0.62rem;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
-.calendar-cell[data-mood='none'] .status-mood {
+.status-mood__icon[data-active='false'] {
+  opacity: 0.45;
+}
+
+.calendar-cell[data-mood^='m'] .status-mood__icon[data-active='true'] {
+  color: rgba(15, 23, 42, 0.85);
+}
+
+.calendar-cell[data-mood^='m'] .status-mood__icon[data-active='false'] {
+  color: rgba(15, 23, 42, 0.5);
+}
+
+.status-mood--empty .status-mood__placeholder {
   color: rgba(248, 250, 252, 0.6);
   font-style: italic;
 }

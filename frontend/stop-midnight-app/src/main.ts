@@ -770,6 +770,26 @@ function renderChips() {
   })
 }
 
+function renderMoodIcons(container: HTMLDivElement, level: number) {
+  container.innerHTML = ''
+  if (level <= 0) {
+    container.classList.add('status-mood--empty')
+    const placeholder = document.createElement('span')
+    placeholder.className = 'status-mood__placeholder'
+    placeholder.textContent = '—'
+    container.appendChild(placeholder)
+    return
+  }
+  container.classList.remove('status-mood--empty')
+  for (let i = 1; i <= 5; i += 1) {
+    const span = document.createElement('span')
+    span.className = 'status-mood__icon'
+    span.dataset.active = (i <= level).toString()
+    span.textContent = i <= level ? '★' : '☆'
+    container.appendChild(span)
+  }
+}
+
 function renderReview() {
   updateDateTimeDisplay()
   const dateLabel = formatMonthDay(state.todayDate)
@@ -873,7 +893,7 @@ function renderCalendar() {
         } else {
           status.classList.add('bad')
         }
-        mood.textContent = moodLevel ? '★'.repeat(moodLevel) + '☆'.repeat(5 - moodLevel) : '-----'
+        renderMoodIcons(mood, moodLevel)
         cell.addEventListener('click', () => openModal(key))
       } else {
         cell.dataset.state = 'empty'
