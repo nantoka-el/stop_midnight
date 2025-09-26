@@ -346,7 +346,17 @@
       "34"
     ],
     "title": "TODAY画面UX見直し仕様策定",
-    "status": "todo",
-    "filename": "0034_today_ui_overhaul_spec_todo.md"
+    "status": "done",
+    "filename": "0034_today_ui_overhaul_spec_done.md"
+  },
+  {
+    "id": "0035",
+    "idRaw": "35",
+    "aliases": [
+      "35"
+    ],
+    "title": "TODAY画面UXリニューアル実装",
+    "status": "done",
+    "filename": "0035_today_ui_overhaul_impl_done.md"
   }
 ]

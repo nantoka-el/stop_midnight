@@ -1,18 +1,18 @@
 # Logs INDEX
-*自動生成: 2025/9/27 2:10:06*
+*自動生成: 2025/9/27 3:11:12*
 
 ## 📊 サマリー
 - BACKLOG: 1件
-- TODO: 11件
+- TODO: 10件
 - REVIEW: 6件
-- DONE: 17件
-- 合計: 35件
+- DONE: 19件
+- 合計: 36件
 
 ## 📑 BACKLOG (1)
 
 - **0004: プライバシー保護機能の検討** - [0004_privacy_guard_backlog.md](./tasks/0004_privacy_guard_backlog.md)
 
-## 📝 TODO (11)
+## 📝 TODO (10)
 
 - **0002: 目標設定フローの仕様整理** - [0002_goal_setting_spec_todo.md](./tasks/0002_goal_setting_spec_todo.md)
 - **0005: FCM通知基盤の設計** - [0005_fcm_notification_plan_todo.md](./tasks/0005_fcm_notification_plan_todo.md)
@@ -24,7 +24,6 @@
 - **0030: UI再調整と演出ブラッシュアップ** - [0030_ui_polish_secondpass_todo.md](./tasks/0030_ui_polish_secondpass_todo.md)
 - **0031: マルチユーザー対応の設計検討** - [0031_multi_user_design_todo.md](./tasks/0031_multi_user_design_todo.md)
 - **0033: レポジトリDeepDive（nakayama 2025 Autumn）** - [0033_repository_deepdive_nakayama_todo.md](./tasks/0033_repository_deepdive_nakayama_todo.md)
-- **0034: TODAY画面UX見直し仕様策定** - [0034_today_ui_overhaul_spec_todo.md](./tasks/0034_today_ui_overhaul_spec_todo.md)
 
 ## 🔍 REVIEW (6)
 
@@ -35,7 +34,7 @@
 - **0026: FCMプッシュ通知の一気通貫実装** - [0026_fcm_end_to_end_review.md](./tasks/0026_fcm_end_to_end_review.md)
 - **0032: ユーザー設定のFirestore同期** - [0032_user_settings_sync_review.md](./tasks/0032_user_settings_sync_review.md)
 
-## ✅ DONE (17)
+## ✅ DONE (19)
 
 - **0001: Stop Midnight Task Viewer 導入** - [0001_task_viewer_setup_done.md](./tasks/0001_task_viewer_setup_done.md)
 - **0003: コア体験の詳細設計ブレスト** - [0003_core_flow_brainstorm_done.md](./tasks/0003_core_flow_brainstorm_done.md)
@@ -54,4 +53,6 @@
 - **0023: Calendarセルへの気分表示追加** - [0023_calendar_mood_indicator_done.md](./tasks/0023_calendar_mood_indicator_done.md)
 - **0027: Firestore連携による夜ログ保存** - [0027_firestore_integration_done.md](./tasks/0027_firestore_integration_done.md)
 - **0028: PWAアイコンとmanifest整備** - [0028_pwa_assets_setup_done.md](./tasks/0028_pwa_assets_setup_done.md)
+- **0034: TODAY画面UX見直し仕様策定** - [0034_today_ui_overhaul_spec_done.md](./tasks/0034_today_ui_overhaul_spec_done.md)
+- **0035: TODAY画面UXリニューアル実装** - [0035_today_ui_overhaul_impl_done.md](./tasks/0035_today_ui_overhaul_impl_done.md)
 

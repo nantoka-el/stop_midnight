@@ -112,3 +112,6 @@
 {"ts":"2025-09-26T17:06:12.835Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0034_today_ui_overhaul_spec_todo.md"}
 {"ts":"2025-09-26T17:06:55.222Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0024_repository_deepdive_done.md"}
 {"ts":"2025-09-26T17:10:06.450Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0034_today_ui_overhaul_spec_todo.md"}
+{"ts":"2025-09-26T18:09:03.186Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0034_today_ui_overhaul_spec_done.md"}
+{"ts":"2025-09-26T18:10:18.621Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0034_today_ui_overhaul_spec_done.md"}
+{"ts":"2025-09-26T18:11:02.275Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0035_today_ui_overhaul_impl_done.md"}
