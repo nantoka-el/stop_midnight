@@ -1413,13 +1413,15 @@ function bindModal() {
   })
   modalEditPlan.addEventListener('click', () => {
     if (!activeModalDateKey) return
+    const targetKey = activeModalDateKey
     closeModal()
-    selectDateForEditing(activeModalDateKey, 'plan')
+    selectDateForEditing(targetKey, 'plan')
   })
   modalEditReview.addEventListener('click', () => {
     if (!activeModalDateKey) return
+    const targetKey = activeModalDateKey
     closeModal()
-    selectDateForEditing(activeModalDateKey, 'review')
+    selectDateForEditing(targetKey, 'review')
   })
   modalDelete.addEventListener('click', () => {
     if (!activeModalDateKey) return
