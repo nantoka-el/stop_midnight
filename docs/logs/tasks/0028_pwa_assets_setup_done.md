@@ -4,7 +4,7 @@ Author: nakayama
 Edited-By: nakayama 2025-09-25
 
 - 概要: ホーム画面追加に必要なPWAアイコン/manifest/service worker設定を整備する
-- 状態: TODO（ファイル名末尾が唯一の真実）
+- 状態: DONE（ファイル名末尾が唯一の真実）
 - 受け入れ基準:
   - `manifest.webmanifest` と複数解像度のアプリアイコンが用意され、Pages公開版で配信されている
   - Service Worker が PWA要件を満たす（オフライン対応範囲を定義）
@@ -16,4 +16,5 @@ Edited-By: nakayama 2025-09-25
 
 ---
 Change Log
+- 2025-09-26 nakayama: manifest/index更新とアイコン配置を反映
 - 2025-09-25 nakayama: 作成

@@ -100,3 +100,11 @@
 {"ts":"2025-09-26T11:52:15.489Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0032_user_settings_sync_todo.md"}
 {"ts":"2025-09-26T13:26:29.150Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0032_user_settings_sync_review.md"}
 {"ts":"2025-09-26T13:29:44.764Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0032_user_settings_sync_review.md"}
+{"ts":"2025-09-26T14:28:13.806Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0033_repository_deepdive_nakayama_todo.md"}
+{"ts":"2025-09-26T14:28:23.389Z","type":"status","author":"kirara","filename":"0024_repository_deepdive_done.md","prevFilename":"0024_repository_deepdive_todo.md","from":"todo","to":"done"}
+{"ts":"2025-09-26T14:28:24.162Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0024_repository_deepdive_todo.md"}
+{"ts":"2025-09-26T16:36:53.267Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0003_core_flow_brainstorm_done.md"}
+{"ts":"2025-09-26T16:41:08.250Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0028_pwa_assets_setup_done.md"}
+{"ts":"2025-09-26T16:42:41.644Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0028_pwa_assets_setup_done.md"}
+{"ts":"2025-09-26T16:44:58.941Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0032_user_settings_sync_review.md"}
+{"ts":"2025-09-26T16:47:55.872Z","type":"regen","reason":"fs-change","path":"/Users/m2maxkirara/dev/stop_midnight/docs/logs/tasks/0028_pwa_assets_setup_done.md"}
