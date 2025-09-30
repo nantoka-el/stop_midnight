@@ -368,5 +368,25 @@
     "title": "オープニング演出・パスコード導入・UI調整",
     "status": "todo",
     "filename": "0036_opening_passcode_refresh_todo.md"
+  },
+  {
+    "id": "0037",
+    "idRaw": "37",
+    "aliases": [
+      "37"
+    ],
+    "title": "リポジトリ全体DeepDive（nakayama）",
+    "status": "todo",
+    "filename": "0037_repository_deepdive_nakayama_todo.md"
+  },
+  {
+    "id": "0038",
+    "idRaw": "38",
+    "aliases": [
+      "38"
+    ],
+    "title": "Calendar/TODAY日付体験見直しとメータ調整",
+    "status": "todo",
+    "filename": "0038_calendar_entry_clarity_todo.md"
   }
 ]

@@ -129,9 +129,28 @@ body {
 }
 
 .today-header__datetime {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.today-header__datetime #today-info {
   font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 0.04em;
+}
+
+.today-header__range {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.today-header__log {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  opacity: 0.85;
 }
 
 .today-header__streak {
@@ -251,6 +270,15 @@ body {
   flex-direction: column;
   gap: 8px;
   font-size: 0.95rem;
+}
+
+.meta-primary {
+  font-weight: 600;
+}
+
+.meta-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .badges {
@@ -689,6 +717,13 @@ button {
   margin: 12px 0;
 }
 
+.modal-night,
+.modal-log {
+  margin: 4px 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 .modal-plan strong,
 .modal-review strong,
 .modal-streak strong {
@@ -698,9 +733,31 @@ button {
 }
 
 .modal-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+.modal-meta__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-meta__label {
+  min-width: 68px;
   font-size: 0.85rem;
   color: var(--text-muted);
-  margin-top: 8px;
+}
+
+.modal-meta__value {
+  font-size: 0.95rem;
+}
+
+.modal-meta .status-mood {
+  justify-content: flex-start;
 }
 
 .settings-form {

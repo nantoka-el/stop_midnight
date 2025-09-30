@@ -1,18 +1,18 @@
 # Logs INDEX
-*自動生成: 2025/9/27 5:34:31*
+*自動生成: 2025/9/30 20:42:02*
 
 ## 📊 サマリー
 - BACKLOG: 1件
-- TODO: 10件
+- TODO: 12件
 - REVIEW: 2件
 - DONE: 24件
-- 合計: 37件
+- 合計: 39件
 
 ## 📑 BACKLOG (1)
 
 - **0004: プライバシー保護機能の検討** - [0004_privacy_guard_backlog.md](./tasks/0004_privacy_guard_backlog.md)
 
-## 📝 TODO (10)
+## 📝 TODO (12)
 
 - **0002: 目標設定フローの仕様整理** - [0002_goal_setting_spec_todo.md](./tasks/0002_goal_setting_spec_todo.md)
 - **0005: FCM通知基盤の設計** - [0005_fcm_notification_plan_todo.md](./tasks/0005_fcm_notification_plan_todo.md)
@@ -24,6 +24,8 @@
 - **0030: UI再調整と演出ブラッシュアップ** - [0030_ui_polish_secondpass_todo.md](./tasks/0030_ui_polish_secondpass_todo.md)
 - **0031: マルチユーザー対応の設計検討** - [0031_multi_user_design_todo.md](./tasks/0031_multi_user_design_todo.md)
 - **0036: オープニング演出・パスコード導入・UI調整** - [0036_opening_passcode_refresh_todo.md](./tasks/0036_opening_passcode_refresh_todo.md)
+- **0037: リポジトリ全体DeepDive（nakayama）** - [0037_repository_deepdive_nakayama_todo.md](./tasks/0037_repository_deepdive_nakayama_todo.md)
+- **0038: Calendar/TODAY日付体験見直しとメータ調整** - [0038_calendar_entry_clarity_todo.md](./tasks/0038_calendar_entry_clarity_todo.md)
 
 ## 🔍 REVIEW (2)
 

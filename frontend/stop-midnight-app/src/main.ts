@@ -155,13 +155,25 @@ function formatWeekdayShort(date: Date): string {
   return weekdays[date.getDay()]
 }
 
-function formatFullDateTime(date: Date, reference: Date): string {
+function formatDateWithWeekday(date: Date): string {
   const month = `${date.getMonth() + 1}`
   const day = `${date.getDate()}`
   const weekday = formatWeekdayShort(date)
+  return `${month}/${day} (${weekday})`
+}
+
+function formatNightSpan(date: Date): string {
+  const nightLabel = formatDateWithWeekday(date)
+  const nextMorning = new Date(date)
+  nextMorning.setDate(nextMorning.getDate() + 1)
+  const morningLabel = formatDateWithWeekday(nextMorning)
+  return `${nightLabel} 夜 → 翌 ${morningLabel} 朝`
+}
+
+function formatCurrentTimeLabel(reference: Date): string {
   const hours = `${reference.getHours()}`.padStart(2, '0')
   const minutes = `${reference.getMinutes()}`.padStart(2, '0')
-  return `${month}/${day} (${weekday}) ${hours}:${minutes}`
+  return `現在 ${hours}:${minutes}`
 }
 
 let openingTypingTimer: number | undefined
@@ -170,10 +182,11 @@ let gratitudeAnimation: Animation | null = null
 
 function updateDateTimeDisplay() {
   const now = new Date()
-  const label = formatFullDateTime(state.todayDate, now)
-  todayInfo.textContent = label
+  todayInfo.textContent = `${formatDateWithWeekday(state.todayDate)} の記録`
+  todayNightLabel.textContent = `対象夜: ${formatNightSpan(state.todayDate)}`
+  todayLogLabel.textContent = `ログキー: ${formatDate(state.todayDate)}`
   if (currentTab === 'today') {
-    headerTime.textContent = label
+    headerTime.textContent = formatCurrentTimeLabel(now)
   }
 }
 
@@ -440,7 +453,11 @@ appRoot.innerHTML = `
     <section id="today-view" class="tab-view active">
       <div class="today-card" id="planner-card">
         <div class="today-header">
-          <div class="today-header__datetime" id="today-info">--</div>
+          <div class="today-header__datetime">
+            <div id="today-info">--</div>
+            <div id="today-night-label" class="today-header__range"></div>
+            <div id="today-log-label" class="today-header__log"></div>
+          </div>
           <div class="today-header__streak" id="today-streak"></div>
           <div class="badges" id="avoidance-badges"></div>
         </div>
@@ -465,7 +482,8 @@ appRoot.innerHTML = `
 
       <div class="today-card hidden" id="review-card">
         <div class="today-meta">
-          <div id="review-night-label">対象夜: --</div>
+          <div id="review-night-label" class="meta-primary">対象夜: --</div>
+          <div id="review-night-range" class="meta-sub"></div>
           <div class="previous-plan" id="previous-plan"></div>
           <div class="review-info" id="review-meta-info"></div>
         </div>
@@ -574,18 +592,33 @@ appRoot.innerHTML = `
     </button>
   </nav>
 
-  <div class="modal hidden" id="calendar-modal">
-    <div class="modal-content">
-      <div class="modal-ribbon" id="modal-ribbon">連続達成</div>
-      <button class="modal-close" id="modal-close">×</button>
-      <h2 id="modal-date"></h2>
-      <p class="modal-streak"><strong>連続達成</strong><span id="modal-streak"></span></p>
-      <p class="modal-plan"><strong>PLAN</strong><span id="modal-plan"></span></p>
-      <p class="modal-review"><strong>REVIEW</strong><span id="modal-review"></span></p>
-      <p class="modal-meta" id="modal-meta"></p>
-      <div class="modal-actions">
-        <button type="button" id="modal-edit-plan" class="ghost">計画を編集</button>
-        <button type="button" id="modal-edit-review" class="ghost">レビューを編集</button>
+      <div class="modal hidden" id="calendar-modal">
+        <div class="modal-content">
+          <div class="modal-ribbon" id="modal-ribbon">連続達成</div>
+          <button class="modal-close" id="modal-close">×</button>
+          <h2 id="modal-date"></h2>
+          <p class="modal-night" id="modal-night-range"></p>
+          <p class="modal-log" id="modal-log-key"></p>
+          <p class="modal-streak"><strong>連続達成</strong><span id="modal-streak"></span></p>
+          <p class="modal-plan"><strong>PLAN</strong><span id="modal-plan"></span></p>
+          <p class="modal-review"><strong>REVIEW</strong><span id="modal-review"></span></p>
+          <div class="modal-meta" id="modal-meta">
+            <div class="modal-meta__row">
+              <span class="modal-meta__label">気分</span>
+              <div class="status-mood" id="modal-mood"></div>
+            </div>
+            <div class="modal-meta__row">
+              <span class="modal-meta__label">回避</span>
+              <span class="modal-meta__value" id="modal-avoided"></span>
+            </div>
+            <div class="modal-meta__row">
+              <span class="modal-meta__label">最終更新</span>
+              <span class="modal-meta__value" id="modal-updated"></span>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" id="modal-edit-plan" class="ghost">計画を編集</button>
+            <button type="button" id="modal-edit-review" class="ghost">レビューを編集</button>
         <button type="button" id="modal-delete" class="ghost danger">削除する</button>
       </div>
     </div>
@@ -606,11 +639,14 @@ const chipInput = qs<HTMLInputElement>('#chip-input')
 const reminderToggle = qs<HTMLInputElement>('#reminder-toggle')
 const badgesWrap = qs<HTMLDivElement>('#avoidance-badges')
 const todayInfo = qs<HTMLDivElement>('#today-info')
+const todayNightLabel = qs<HTMLDivElement>('#today-night-label')
+const todayLogLabel = qs<HTMLDivElement>('#today-log-label')
 const todayStreak = qs<HTMLDivElement>('#today-streak')
 const achievementStrip = qs<HTMLDivElement>('#achievement-strip')
 const nextTargetMessage = qs<HTMLDivElement>('#next-target')
 const todayFooter = qs<HTMLDivElement>('#today-footer')
 const reviewNightLabel = qs<HTMLDivElement>('#review-night-label')
+const reviewNightRange = qs<HTMLDivElement>('#review-night-range')
 const previousPlanEl = qs<HTMLDivElement>('#previous-plan')
 const reviewMetaInfo = qs<HTMLDivElement>('#review-meta-info')
 const reviewText = qs<HTMLTextAreaElement>('#review-text')
@@ -622,10 +658,14 @@ const calendarGrid = qs<HTMLDivElement>('#calendar-grid')
 const modal = qs<HTMLDivElement>('#calendar-modal')
 const modalRibbon = qs<HTMLDivElement>('#modal-ribbon')
 const modalDate = qs<HTMLHeadingElement>('#modal-date')
+const modalNightRange = qs<HTMLParagraphElement>('#modal-night-range')
+const modalLogKey = qs<HTMLParagraphElement>('#modal-log-key')
 const modalStreak = qs<HTMLSpanElement>('#modal-streak')
 const modalPlan = qs<HTMLSpanElement>('#modal-plan')
 const modalReview = qs<HTMLSpanElement>('#modal-review')
-const modalMeta = qs<HTMLParagraphElement>('#modal-meta')
+const modalMood = qs<HTMLDivElement>('#modal-mood')
+const modalAvoided = qs<HTMLSpanElement>('#modal-avoided')
+const modalUpdated = qs<HTMLSpanElement>('#modal-updated')
 const modalEditPlan = qs<HTMLButtonElement>('#modal-edit-plan')
 const modalEditReview = qs<HTMLButtonElement>('#modal-edit-review')
 const modalDelete = qs<HTMLButtonElement>('#modal-delete')
@@ -799,17 +839,21 @@ function renderMoodIcons(container: HTMLDivElement, level: number) {
 
 function renderReview() {
   updateDateTimeDisplay()
-  const dateLabel = formatMonthDay(state.todayDate)
+  const dateLabel = formatDateWithWeekday(state.todayDate)
   todayStreak.textContent = state.streak > 0 ? `連続${state.streak}日 継続中` : '今日から再スタート'
-  reviewNightLabel.textContent = `対象夜: ${dateLabel} (ログ上は ${formatDate(state.todayDate)})`
+  reviewNightLabel.textContent = `対象夜: ${dateLabel}`
+  reviewNightRange.textContent = formatNightSpan(state.todayDate)
   previousPlanEl.textContent = `計画: ${state.todayPlan.text || '未入力'}`
   reviewText.value = state.review.notes
   moodSlider.value = `${state.review.mood}`
   moodValue.textContent = `${state.review.mood}`
 
-  reviewMetaInfo.textContent = state.review.reviewTimestamp
-    ? `最終保存: ${formatDate(state.review.reviewTimestamp)} ${state.review.reviewTimestamp.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`
-    : 'レビュー未保存'
+  let lastSaved = 'レビュー未保存'
+  if (state.review.reviewTimestamp) {
+    const timestamp = state.review.reviewTimestamp
+    lastSaved = `${formatDate(timestamp)} ${timestamp.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`
+  }
+  reviewMetaInfo.textContent = `ログキー: ${formatDate(state.todayDate)} / 最終保存: ${lastSaved}`
 
   avoidanceChecks.innerHTML = ''
   state.avoidanceGoals.forEach((goal) => {
@@ -907,6 +951,10 @@ function renderCalendar() {
         cell.dataset.mood = 'none'
         status.textContent = '—'
         mood.textContent = ''
+        const dateKey = formatDateKey(cellDate)
+        cell.addEventListener('click', () => {
+          selectDateForEditing(dateKey, 'plan')
+        })
       }
 
       cell.append(dayEl, status, mood)
@@ -919,15 +967,19 @@ function openModal(dateKey: string) {
   const record = getRecord(dateKey)
   if (!record) return
   activeModalDateKey = dateKey
-  modalDate.textContent = `${dateKey} の夜`
+  const modalDateObj = parseDateKeyToDate(dateKey)
+  modalDate.textContent = `${formatDateWithWeekday(modalDateObj)} の記録`
+  modalNightRange.textContent = formatNightSpan(modalDateObj)
+  modalLogKey.textContent = `ログキー: ${dateKey}`
   modalStreak.textContent = record.streak > 0 ? `${record.streak}日連続達成` : '連続なし'
   modalPlan.textContent = record.plan?.text ?? '未入力'
   modalReview.textContent = record.review?.text ?? 'レビュー未記録'
   const mood = record.review?.mood ?? 0
   const reviewTime = record.review?.updatedAt ?? '未記録'
   const avoided = record.review?.avoided?.length ? record.review.avoided.join(' / ') : '---'
-  const moodStars = mood ? '★'.repeat(mood) + '☆'.repeat(5 - mood) : '---'
-  modalMeta.textContent = `気分: ${moodStars} / 回避: ${avoided} / 最終更新: ${reviewTime}`
+  renderMoodIcons(modalMood, mood)
+  modalAvoided.textContent = avoided
+  modalUpdated.textContent = reviewTime
   modalRibbon.dataset.active = record.streak > 0 ? 'true' : 'false'
   modal.classList.remove('hidden')
 }
